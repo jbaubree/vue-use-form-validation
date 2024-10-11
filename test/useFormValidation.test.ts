@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { z } from 'zod'
 import { useFormValidation } from '../src/useFormValidation'
-import type { FieldErrors } from '../src/types'
 
 describe('useFormValidation', () => {
   let schema: z.ZodObject<any>
