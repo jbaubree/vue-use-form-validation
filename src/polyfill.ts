@@ -1,7 +1,7 @@
-export function polyfillGroupBy(): void {
+export function polyfillGroupBy<T>(): void {
   if (!Object.groupBy) {
     Object.defineProperty(Object, 'groupBy', {
-      value(array: any[], keyGetter: (item: any) => string): Record<string, any[]> {
+      value(array: T[], keyGetter: (item: T) => string): Record<string, T[]> {
         return array.reduce((result, currentItem) => {
           const key = keyGetter(currentItem)
           if (!result[key]) {
@@ -9,7 +9,7 @@ export function polyfillGroupBy(): void {
           }
           result[key].push(currentItem)
           return result
-        }, {} as Record<string, any[]>)
+        }, {} as Record<string, T[]>)
       },
       writable: true,
       configurable: true,
