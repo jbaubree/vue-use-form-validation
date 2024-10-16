@@ -1,9 +1,9 @@
-import { computed, type ComputedRef, type MaybeRefOrGetter, type Ref, ref, toValue, watch } from 'vue'
-import type { ZodTypeAny } from 'zod'
+import { computed, type ComputedRef, type MaybeRefOrGetter, type Ref, shallowRef, toValue, watch } from 'vue'
+import { getErrors } from './errors'
 import { polyfillGroupBy } from './polyfill'
-import type { FieldErrors } from './types'
+import type { FieldErrors, Form, Schema } from './types'
 
-export function useFormValidation<T extends MaybeRefOrGetter<ZodTypeAny>, U extends Record<string, unknown>>(
+export function useFormValidation<T extends Schema<U>, U extends Form>(
   schema: T,
   form: MaybeRefOrGetter<U>,
   options?: { mode: 'eager' | 'lazy' },
@@ -13,7 +13,7 @@ export function useFormValidation<T extends MaybeRefOrGetter<ZodTypeAny>, U exte
     errorCount: ComputedRef<number>
     isValid: Ref<boolean>
     hasError: ComputedRef<boolean>
-    clearErrors: () => null
+    clearErrors: () => void
     getErrorMessage: (path: keyof U) => string | undefined
     focusFirstErroredInput: () => void
     focusInput: (options: { inputName: keyof U }) => void
@@ -21,14 +21,16 @@ export function useFormValidation<T extends MaybeRefOrGetter<ZodTypeAny>, U exte
   polyfillGroupBy()
   const opts = Object.assign({}, { mode: 'lazy' }, options)
 
-  const isValid = ref(true)
-  const errors = ref<FieldErrors<U>>(null)
+  const errors = shallowRef<FieldErrors<U>>({})
 
-  const errorCount = computed(() => Object.keys(errors.value || {}).length)
+  const errorCount = computed(() => Object.keys(errors.value).length)
+  const isValid = computed(() => !errorCount.value)
   const hasError = computed(() => !!errorCount.value)
 
-  const clearErrors = (): null => (errors.value = null)
-  const getErrorMessage = (path: keyof U): string | undefined => errors.value?.[path]?.[0]?.message
+  const clearErrors = (): void => {
+    errors.value = {}
+  }
+  const getErrorMessage = (path: keyof U): string | undefined => errors.value[path]
 
   let unwatch: null | (() => void) = null
   const validationWatch: () => void = () => {
@@ -46,10 +48,8 @@ export function useFormValidation<T extends MaybeRefOrGetter<ZodTypeAny>, U exte
 
   const validate = async (): Promise<FieldErrors<U>> => {
     clearErrors()
-    const result = await toValue(schema).safeParseAsync(toValue(form))
-    isValid.value = result.success
-    if (!result.success) {
-      errors.value = Object.groupBy(result.error.issues, item => item.path[0])
+    errors.value = await getErrors<T, U>(toValue(schema), toValue(form))
+    if (hasError.value) {
       validationWatch()
     }
     return errors.value
@@ -68,12 +68,13 @@ export function useFormValidation<T extends MaybeRefOrGetter<ZodTypeAny>, U exte
     }
   }
 
-  if (opts.mode === 'eager')
+  if (opts.mode === 'eager') {
     validationWatch()
+  }
 
   return {
     validate,
-    errors: errors as ComputedRef<FieldErrors<U>>,
+    errors,
     errorCount,
     isValid,
     hasError,

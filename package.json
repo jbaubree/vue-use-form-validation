@@ -48,8 +48,7 @@
     "prepare": "simple-git-hooks"
   },
   "peerDependencies": {
-    "vue": "^3.5.12",
-    "zod": "^3.23.8"
+    "vue": "^3.5.12"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.3.2",
@@ -60,13 +59,17 @@
     "eslint": "^9.9.1",
     "esno": "^4.7.0",
     "happy-dom": "^15.7.4",
+    "joi": "^17.13.3",
     "lint-staged": "^15.2.10",
     "pnpm": "^9.9.0",
     "simple-git-hooks": "^2.11.1",
     "typescript": "^5.5.4",
     "unbuild": "^2.0.0",
+    "valibot": "^0.42.1",
     "vite": "^5.4.3",
-    "vitest": "^2.0.5"
+    "vitest": "^2.0.5",
+    "yup": "^1.4.0",
+    "zod": "^3.23.8"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"

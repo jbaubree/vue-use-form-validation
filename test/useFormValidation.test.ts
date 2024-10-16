@@ -1,11 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { z } from 'zod'
+import type { Ref } from 'vue'
 import { useFormValidation } from '../src/useFormValidation'
 
 describe('useFormValidation', () => {
-  let schema: z.ZodObject<any>
-  let form: any
+  let schema: z.ZodObject<{
+    name: z.ZodString
+    email: z.ZodString
+  }>
+  let form: Ref<z.infer<typeof schema>>
 
   beforeEach(() => {
     schema = z.object({
@@ -22,7 +26,7 @@ describe('useFormValidation', () => {
     form.value = { name: 'John', email: 'john@example.com' }
     const { validate, errors, isValid } = useFormValidation(schema, form)
     await validate()
-    expect(errors.value).toBe(null)
+    expect(errors.value).toStrictEqual({})
     expect(isValid.value).toBe(true)
   })
 
@@ -43,7 +47,7 @@ describe('useFormValidation', () => {
     await validate()
     expect(errors.value).toHaveProperty('name')
     clearErrors()
-    expect(errors.value).toBe(null)
+    expect(errors.value).toStrictEqual({})
   })
 
   it('should focus the first errored input', async () => {
