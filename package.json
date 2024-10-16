@@ -1,7 +1,7 @@
 {
   "name": "vue-form-validator",
   "type": "module",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "packageManager": "pnpm@9.9.0",
   "author": "JB Aubrée <jb.aubree@protonmail.com>",
   "license": "MIT",
