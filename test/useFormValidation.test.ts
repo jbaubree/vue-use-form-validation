@@ -1,7 +1,7 @@
+import type { Ref } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref, toValue } from 'vue'
 import * as z from 'zod'
-import type { Ref } from 'vue'
 import { getErrors } from '../src/errors'
 import { useFormValidation } from '../src/useFormValidation'
 import { flushPromises } from './utils/flushPromises'

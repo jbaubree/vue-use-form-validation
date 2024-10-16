@@ -1,6 +1,6 @@
 import type { BaseIssue, BaseSchema } from 'valibot'
-import { isNonNullObject } from './utils'
 import type { FieldErrors, Form } from './types'
+import { isNonNullObject } from './utils'
 
 type ValibotSchema = BaseSchema<unknown, unknown, BaseIssue<unknown>>
 
@@ -13,10 +13,10 @@ export function isValibotSchema(schema: unknown): schema is ValibotSchema {
 export function getValibotErrors<T extends Form>(schema: ValibotSchema, form: T): FieldErrors<T> {
   const errors: FieldErrors<T> = {}
   const result = schema._run({ typed: false, value: form }, {})
-  result.issues?.forEach(((i) => {
+  result.issues?.forEach((i) => {
     if (i.path) {
       errors[i.path[0].key as keyof T] = i.message
     }
-  }))
+  })
   return errors
 }

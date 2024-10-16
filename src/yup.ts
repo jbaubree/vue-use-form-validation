@@ -1,6 +1,6 @@
 import type { ObjectSchema, ValidationError as YupError } from 'yup'
-import { isNonNullObject } from './utils'
 import type { FieldErrors, Form } from './types'
+import { isNonNullObject } from './utils'
 
 export function isYupSchema<T extends object>(schema: unknown): schema is ObjectSchema<T> {
   return isNonNullObject(schema)
@@ -20,11 +20,11 @@ export async function getYupErrors<T extends Form>(schema: ObjectSchema<T>, form
   }
   catch (error) {
     if (isYupError(error)) {
-      error.inner.forEach(((i) => {
+      error.inner.forEach((i) => {
         if (i.path) {
           errors[i.path.split('.')[0] as keyof T] = i.message
         }
-      }))
+      })
     }
     return errors
   }

@@ -1,8 +1,8 @@
+import type { FieldErrors, Form, Schema } from './types'
 import { getJoiErrors, isJoiSchema } from './joi'
 import { getValibotErrors, isValibotSchema } from './valibot'
 import { getYupErrors, isYupSchema } from './yup'
 import { getZodErrors, isZodSchema } from './zod'
-import type { FieldErrors, Form, Schema } from './types'
 
 export async function getErrors<T extends Schema<U>, U extends Form>(schema: T, form: U): Promise<FieldErrors<U>> {
   if (isZodSchema(schema)) {

@@ -1,7 +1,7 @@
 import type { ValidationError as JoiError, Schema as JoiSchema } from 'joi'
 
-import { isNonNullObject } from './utils'
 import type { FieldErrors, Form } from './types'
+import { isNonNullObject } from './utils'
 
 export function isJoiSchema(schema: unknown): schema is JoiSchema {
   return isNonNullObject(schema)
@@ -23,7 +23,7 @@ export async function getJoiErrors<T extends Form>(schema: JoiSchema, form: T): 
   }
   catch (error) {
     if (isJoiError(error)) {
-      error.details.forEach((i => errors[i.path[0] as keyof T] = i.message))
+      error.details.forEach(i => errors[i.path[0] as keyof T] = i.message)
     }
     return errors
   }

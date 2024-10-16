@@ -1,7 +1,7 @@
+import type { FieldErrors, Form, Schema } from './types'
 import { computed, type ComputedRef, type MaybeRefOrGetter, type Ref, shallowRef, toValue, watch } from 'vue'
 import { getErrors } from './errors'
 import { polyfillGroupBy } from './polyfill'
-import type { FieldErrors, Form, Schema } from './types'
 
 export function useFormValidation<T extends Schema<U>, U extends Form>(
   schema: T,

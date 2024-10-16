@@ -1,6 +1,6 @@
 import type { ZodSchema } from 'zod'
-import { isNonNullObject } from './utils'
 import type { FieldErrors } from './types'
+import { isNonNullObject } from './utils'
 
 export function isZodSchema(schema: unknown): schema is ZodSchema {
   return isNonNullObject(schema) && schema.parse !== undefined
