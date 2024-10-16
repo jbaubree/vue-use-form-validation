@@ -1,17 +1,17 @@
 {
-  "name": "vue-form-validator",
+  "name": "use-vue-form-validation",
   "type": "module",
   "version": "0.2.0",
   "packageManager": "pnpm@9.9.0",
   "author": "JB Aubrée <jb.aubree@protonmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/jbaubree/vue-form-validator#readme",
+  "homepage": "https://github.com/jbaubree/use-vue-form-validation#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jbaubree/vue-form-validator.git"
+    "url": "git+https://github.com/jbaubree/use-vue-form-validation.git"
   },
   "bugs": {
-    "url": "https://github.com/jbaubree/vue-form-validator/issues"
+    "url": "https://github.com/jbaubree/use-vue-form-validation/issues"
   },
   "keywords": [],
   "sideEffects": false,
