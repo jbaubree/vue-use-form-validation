@@ -22,7 +22,7 @@ export async function getYupErrors<T extends Form>(schema: ObjectSchema<T>, form
     if (isYupError(error)) {
       error.inner.forEach(((i) => {
         if (i.path) {
-          errors[i.path as keyof T] = i.message
+          errors[i.path.split('.')[0] as keyof T] = i.message
         }
       }))
     }

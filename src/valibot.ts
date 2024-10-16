@@ -5,12 +5,9 @@ import type { FieldErrors, Form } from './types'
 type ValibotSchema = BaseSchema<unknown, unknown, BaseIssue<unknown>>
 
 export function isValibotSchema(schema: unknown): schema is ValibotSchema {
-  return isNonNullObject(schema)
-    && (
-      '_parse' in schema
-      || '_run' in schema
-      || (typeof schema === 'function' && 'schema' in schema)
-    )
+  return (isNonNullObject(schema)
+    && ('_parse' in schema || '_run' in schema))
+    || (typeof schema === 'function' && 'schema' in schema)
 }
 
 export function getValibotErrors<T extends Form>(schema: ValibotSchema, form: T): FieldErrors<T> {
