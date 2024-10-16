@@ -1,17 +1,17 @@
 {
-  "name": "vue3-simple-zod-form-validator",
+  "name": "vue-form-validator",
   "type": "module",
   "version": "0.1.1",
   "packageManager": "pnpm@9.9.0",
   "author": "JB Aubrée <jb.aubree@protonmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/jbaubree/vue3-simple-zod-form-validator#readme",
+  "homepage": "https://github.com/jbaubree/vue-form-validator#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jbaubree/vue3-simple-zod-form-validator.git"
+    "url": "git+https://github.com/jbaubree/vue-form-validator.git"
   },
   "bugs": {
-    "url": "https://github.com/jbaubree/vue3-simple-zod-form-validator/issues"
+    "url": "https://github.com/jbaubree/vue-form-validator/issues"
   },
   "keywords": [],
   "sideEffects": false,
