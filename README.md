@@ -1,4 +1,4 @@
-# simple form validation composable for vue3 using zod
+# simple form validation composable for vue3
 
 [![NPM Version](https://badgen.net/npm/v/vue-use-form-validation)](https://www.npmjs.com/package/vue-use-form-validation)
 [![Monthly Downloads](https://badgen.net/npm/dm/vue-use-form-validation)](https://www.npmjs.com/package/vue-use-form-validation)
