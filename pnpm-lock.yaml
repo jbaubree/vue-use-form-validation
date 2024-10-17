@@ -51,6 +51,9 @@ importers:
       simple-git-hooks:
         specifier: ^2.11.1
         version: 2.11.1
+      superstruct:
+        specifier: ^2.0.2
+        version: 2.0.2
       typescript:
         specifier: ^5.6.3
         version: 5.6.3
@@ -3081,6 +3084,10 @@ packages:
     engines: {node: ^18.12.0 || ^20.9.0 || >=22.0}
     peerDependencies:
       postcss: ^8.4.31
+
+  superstruct@2.0.2:
+    resolution: {integrity: sha512-uV+TFRZdXsqXTL2pRvujROjdZQ4RAlBUS5BTh9IGm+jTqQntYThciG/qu57Gs69yjnVUSqdxF9YLmSnpupBW9A==}
+    engines: {node: '>=14.0.0'}
 
   supports-color@5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}
@@ -6534,6 +6541,8 @@ snapshots:
       browserslist: 4.24.0
       postcss: 8.4.47
       postcss-selector-parser: 6.1.2
+
+  superstruct@2.0.2: {}
 
   supports-color@5.5.0:
     dependencies:

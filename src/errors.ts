@@ -1,37 +1,41 @@
 import type { FieldErrors, Form, GetErrorsFn, Schema } from './types'
 import { getJoiErrors, isJoiSchema } from './joi'
+import { getSuperStructErrors, isSuperStructSchema } from './superstruct'
 import { getValibotErrors, isValibotSchema } from './valibot'
 import { getYupErrors, isYupSchema } from './yup'
 import { getZodErrors, isZodSchema } from './zod'
 
-export async function getErrors<T extends Schema<U>, U extends Form>(
-  schema: T,
-  form: U,
-): Promise<FieldErrors<U>>
-export async function getErrors<T, U extends Form>(
-  schema: T,
-  form: U,
-  transformFn: GetErrorsFn<T, U>,
-): Promise<FieldErrors<U>>
-export async function getErrors<T, U extends Form>(
-  schema: T,
-  form: U,
-  transformFn?: GetErrorsFn<T, U>,
-): Promise<FieldErrors<U>> {
+export async function getErrors<S extends Schema<F>, F extends Form>(
+  schema: S,
+  form: F,
+): Promise<FieldErrors<F>>
+export async function getErrors<S, F extends Form>(
+  schema: S,
+  form: F,
+  transformFn: GetErrorsFn<S, F>,
+): Promise<FieldErrors<F>>
+export async function getErrors<S, F extends Form>(
+  schema: S,
+  form: F,
+  transformFn?: GetErrorsFn<S, F>,
+): Promise<FieldErrors<F>> {
   if (transformFn) {
     return await transformFn(schema, form)
   }
   if (isZodSchema(schema)) {
-    return await getZodErrors<U>(schema, form)
+    return await getZodErrors<F>(schema, form)
   }
-  if (isYupSchema<U>(schema)) {
-    return await getYupErrors<U>(schema, form)
+  if (isYupSchema<F>(schema)) {
+    return await getYupErrors<F>(schema, form)
   }
   if (isJoiSchema(schema)) {
-    return await getJoiErrors<U>(schema, form)
+    return await getJoiErrors<F>(schema, form)
   }
   if (isValibotSchema(schema)) {
-    return getValibotErrors<U>(schema, form)
+    return getValibotErrors<F>(schema, form)
+  }
+  if (isSuperStructSchema<S, F>(schema)) {
+    return getSuperStructErrors<S, F>(schema, form)
   }
   return {}
 }

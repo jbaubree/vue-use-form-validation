@@ -10,12 +10,12 @@ export function isValibotSchema(schema: unknown): schema is ValibotSchema {
     || (typeof schema === 'function' && 'schema' in schema)
 }
 
-export function getValibotErrors<T extends Form>(schema: ValibotSchema, form: T): FieldErrors<T> {
-  const errors: FieldErrors<T> = {}
+export function getValibotErrors<F extends Form>(schema: ValibotSchema, form: F): FieldErrors<F> {
+  const errors: FieldErrors<F> = {}
   const result = schema._run({ typed: false, value: form }, {})
   result.issues?.forEach((i) => {
     if (i.path) {
-      errors[i.path[0].key as keyof T] = i.message
+      errors[i.path[0].key as keyof F] = i.message
     }
   })
   return errors

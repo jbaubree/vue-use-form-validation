@@ -1,10 +1,12 @@
 import { object as joiObject, string as joiString } from 'joi'
+import * as s from 'superstruct'
 import * as v from 'valibot'
 import { describe, expect, it, vi } from 'vitest'
 import * as yup from 'yup'
 import * as z from 'zod'
 import { getErrors } from '../src/errors'
 import * as joiModule from '../src/joi'
+import * as superStructModule from '../src/superstruct'
 import * as valibotModule from '../src/valibot'
 import * as yupModule from '../src/yup'
 import * as zodModule from '../src/zod'
@@ -35,6 +37,13 @@ vi.mock('../src/valibot', async (importOriginal) => {
   return {
     ...actual,
     getValibotErrors: vi.fn().mockResolvedValue({ field: 'Valibot: required' }),
+  }
+})
+vi.mock('../src/superstruct', async (importOriginal) => {
+  const actual = await importOriginal<object>()
+  return {
+    ...actual,
+    getSuperStructErrors: vi.fn().mockResolvedValue({ field: 'Superstruct: required' }),
   }
 })
 
@@ -69,6 +78,14 @@ describe('getErrors', () => {
     const errors = await getErrors(schema, form)
     expect(errors).toEqual({ field: 'Valibot: required' })
     expect(valibotModule.getValibotErrors).toHaveBeenCalledWith(schema, form)
+  })
+
+  it('should call getSuperStructErrors for Superstruct schemas', async () => {
+    const schema = s.object({ field: s.string() })
+    const form = { field: '' }
+    const errors = await getErrors(schema, form)
+    expect(errors).toEqual({ field: 'Superstruct: required' })
+    expect(superStructModule.getSuperStructErrors).toHaveBeenCalledWith(schema, form)
   })
 
   it('should return an empty object for unknown schemas', async () => {

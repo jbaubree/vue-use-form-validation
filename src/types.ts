@@ -1,4 +1,5 @@
 import type { Schema as JoiSchema } from 'joi'
+import type { Struct } from 'superstruct'
 import type { BaseIssue, BaseSchema as ValibotSchema } from 'valibot'
 import type { ComputedRef, Ref } from 'vue'
 import type { ObjectSchema as YupSchema } from 'yup'
@@ -6,24 +7,25 @@ import type { ZodSchema } from 'zod'
 
 export type Awaitable<T> = T | PromiseLike<T>
 
-export type FieldErrors<T> = Partial<Record<keyof T, string>>
+export type FieldErrors<F> = Partial<Record<keyof F, string>>
 export type Form = Record<string, unknown>
-export type GetErrorsFn<T, U extends Form> = (schema: T, form: U) => Awaitable<FieldErrors<U>>
+export type GetErrorsFn<S, F extends Form> = (schema: S, form: F) => Awaitable<FieldErrors<F>>
 
-export type Schema<T extends object> =
+export type Schema<F extends Form> =
   | ZodSchema
-  | YupSchema<T>
+  | YupSchema<F>
   | ValibotSchema<unknown, unknown, BaseIssue<unknown>>
   | JoiSchema
+  | Struct<F>
 
-export interface ReturnType<T> {
-  validate: () => Promise<FieldErrors<T>>
-  errors: Ref<FieldErrors<T>>
+export interface ReturnType<F> {
+  validate: () => Promise<FieldErrors<F>>
+  errors: Ref<FieldErrors<F>>
   errorCount: ComputedRef<number>
   isValid: Ref<boolean>
   hasError: ComputedRef<boolean>
   clearErrors: () => void
-  getErrorMessage: (path: keyof T) => string | undefined
+  getErrorMessage: (path: keyof F) => string | undefined
   focusFirstErroredInput: () => void
-  focusInput: (options: { inputName: keyof T }) => void
+  focusInput: (options: { inputName: keyof F }) => void
 }

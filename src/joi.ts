@@ -15,15 +15,15 @@ function isJoiError(error: unknown): error is JoiError {
     && error.isJoi === true
 }
 
-export async function getJoiErrors<T extends Form>(schema: JoiSchema, form: T): Promise<FieldErrors<T>> {
-  const errors: FieldErrors<T> = {}
+export async function getJoiErrors<F extends Form>(schema: JoiSchema, form: F): Promise<FieldErrors<F>> {
+  const errors: FieldErrors<F> = {}
   try {
     await schema.validateAsync(form, { abortEarly: false })
     return {}
   }
   catch (error) {
     if (isJoiError(error)) {
-      error.details.forEach(i => errors[i.path[0] as keyof T] = i.message)
+      error.details.forEach(i => errors[i.path[0] as keyof F] = i.message)
     }
     return errors
   }
