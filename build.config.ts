@@ -8,6 +8,7 @@ export default defineBuildConfig({
   clean: true,
   externals: [
     'joi',
+    'superstruct',
     'valibot',
     'yup',
     'zod',
