@@ -78,4 +78,13 @@ describe('getErrors', () => {
     const errors = await getErrors(invalidSchema, form)
     expect(errors).toEqual({})
   })
+
+  it('should call transformFn when provided', async () => {
+    const schema = z.object({ field: z.string() })
+    const form = { field: undefined }
+    const mockTransformFn = vi.fn().mockResolvedValue({ field: 'Custom error' })
+    const errors = await getErrors(schema, form, mockTransformFn)
+    expect(mockTransformFn).toHaveBeenCalledWith(schema, form)
+    expect(errors).toEqual({ field: 'Custom error' })
+  })
 })

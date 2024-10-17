@@ -1,25 +1,25 @@
-import type { FieldErrors, Form, Schema } from './types'
-import { computed, type ComputedRef, type MaybeRefOrGetter, type Ref, shallowRef, toValue, watch } from 'vue'
+import type { FieldErrors, Form, GetErrorsFn, ReturnType, Schema } from './types'
+import { computed, type MaybeRefOrGetter, shallowRef, toValue, watch } from 'vue'
 import { getErrors } from './errors'
 import { polyfillGroupBy } from './polyfill'
 
+export function useFormValidation<T, U extends Form>(
+  schema: T,
+  form: MaybeRefOrGetter<U>,
+  options: { mode?: 'eager' | 'lazy', transformFn: GetErrorsFn<T, U> },
+): ReturnType<U>
 export function useFormValidation<T extends Schema<U>, U extends Form>(
   schema: T,
   form: MaybeRefOrGetter<U>,
-  options?: { mode: 'eager' | 'lazy' },
-): {
-    validate: () => Promise<FieldErrors<U>>
-    errors: Ref<FieldErrors<U>>
-    errorCount: ComputedRef<number>
-    isValid: Ref<boolean>
-    hasError: ComputedRef<boolean>
-    clearErrors: () => void
-    getErrorMessage: (path: keyof U) => string | undefined
-    focusFirstErroredInput: () => void
-    focusInput: (options: { inputName: keyof U }) => void
-  } {
+  options?: { mode?: 'eager' | 'lazy' },
+): ReturnType<U>
+export function useFormValidation<T extends Schema<U>, U extends Form>(
+  schema: T,
+  form: MaybeRefOrGetter<U>,
+  options?: { mode?: 'eager' | 'lazy', transformFn?: GetErrorsFn<T, U> },
+): ReturnType<U> {
   polyfillGroupBy()
-  const opts = Object.assign({}, { mode: 'lazy' }, options)
+  const opts = Object.assign({}, { mode: 'lazy', transformFn: undefined }, options)
 
   const errors = shallowRef<FieldErrors<U>>({})
 
@@ -48,7 +48,9 @@ export function useFormValidation<T extends Schema<U>, U extends Form>(
 
   const validate = async (): Promise<FieldErrors<U>> => {
     clearErrors()
-    errors.value = await getErrors<T, U>(toValue(schema), toValue(form))
+    errors.value = opts.transformFn
+      ? await getErrors<T, U>(toValue(schema), toValue(form), opts.transformFn)
+      : await getErrors<T, U>(toValue(schema), toValue(form))
     if (hasError.value) {
       validationWatch()
     }

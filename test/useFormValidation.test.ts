@@ -2,6 +2,7 @@ import type { Ref } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref, toValue } from 'vue'
 import * as z from 'zod'
+import * as errorModule from '../src/errors'
 import { getErrors } from '../src/errors'
 import { useFormValidation } from '../src/useFormValidation'
 import { flushPromises } from './utils/flushPromises'
@@ -116,5 +117,21 @@ describe('useFormValidation', () => {
     form.value.field2 = 'Invalid'
     await flushPromises()
     expect(errors.value).toEqual(mockErrorsUpdated)
+  })
+
+  it('should use the transformFn if provided in options', async () => {
+    const getErrorsSpy = vi.spyOn(errorModule, 'getErrors')
+    getErrorsSpy.mockImplementation(async (_schema, _form, _transformFn) => {
+      return { field1: 'Transformed error' }
+    })
+    const { validate, errors } = useFormValidation(schema, form, {
+      transformFn: async (_schema, _form) => {
+        return { field1: 'Transformed error' }
+      },
+    })
+    await validate()
+    expect(getErrorsSpy).toHaveBeenCalledWith(schema, toValue(form), expect.any(Function))
+    expect(errors.value).toEqual({ field1: 'Transformed error' })
+    getErrorsSpy.mockRestore()
   })
 })
