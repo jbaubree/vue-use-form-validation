@@ -11,11 +11,23 @@ A Vue 3 composable library for form validation, compatible with Zod, Yup, Joi, V
 
 ## Features
 
-- **Compatibility**: Natively supports Zod, Yup, Joi, Valibot, AJV, and Superstruct.
-- **Custom Validation**: Use a custom `transformFn` to integrate other validation libraries.
-- **Reactive Errors**: Automatically tracks and updates validation errors as form data changes.
-- **Flexible Modes**: Choose between eager and lazy validation modes.
-- **Error Handling**: Easily retrieve error messages and focus on the first errored input.
+⚡️ Automatic caching: Smart client-side caching with request deduplication
+🗄️ Async State: Handle any async state
+📚 Typescript Support: Fully typed with Typescript
+💨 Bundle Size: Small bundle size (<2kb) and fully tree-shakeable
+📦 Zero Dependencies: No dependencies other than Pinia
+⚙️ SSR: Server-side rendering support
+🔌 Plugins: Powerful plugin system
+
+- **⚡️ Compatibility**: Natively supports Zod, Yup, Joi, Valibot, AJV, and Superstruct.
+- **🧩 Type Safety**: Strongly typed with TypeScript, ensuring compile-time validation and reducing runtime errors.
+- **💨 Bundle Size**: Small bundle size (<3kb).
+- **📦 Zero Dependencies**: No dependencies.
+- **✅ Custom Validation**: Compatible with any other validation libraries using `transformFn`.
+- **⚙️ Customizable Validation Modes**: Offers 'eager' and 'lazy' validation modes to fit different user experience needs.
+- **🔗 Reactive Integration**: Fully integrates with Vue’s reactivity system, providing a seamless experience when working with reactive form states.
+- **📈 Performance Optimized**: Efficiently handles validation with minimal performance overhead, making it suitable for large forms.
+- **📅 Easy Integration**: Simple to integrate with existing Vue 3 projects, requiring minimal setup to start validating forms.
 
 ## Installation
 
