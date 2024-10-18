@@ -43,6 +43,7 @@ jobs:
         uses: wjervis7/vitest-badge-action@v1.0.0
         if: ${{ matrix.node == 22 && matrix.os == 'ubuntu-latest' }}
         with:
+          badge-text: Coverage
           result-type: statements
           upload-badge: false
 
