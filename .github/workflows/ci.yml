@@ -36,6 +36,15 @@ jobs:
       - name: Run test
         run: pnpm test
 
+      - name: Publish Results Badge
+        uses: wjervis7/vitest-badge-action@v1.0.0
+        if: ${{ matrix.node == 22 && matrix.os == 'ubuntu-latest' }}
+        with:
+          result-type: lines
+          gist-token: ${{ secrets.GIST_TOKEN }}
+          gist-url: https://gist.github.com/jbaubree/49ef05b87cfb759d72800c33a6ead310
+          upload-badge: ${{ github.base_ref == 'refs/heads/main' }}
+
   lint:
     runs-on: ubuntu-latest
     name: 'Lint: node-20, ubuntu-latest'

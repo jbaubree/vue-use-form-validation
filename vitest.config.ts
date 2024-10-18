@@ -5,6 +5,7 @@ export default defineConfig({
     environment: 'happy-dom',
     coverage: {
       enabled: true,
+      reporter: ['json-summary'],
     },
   },
 })
