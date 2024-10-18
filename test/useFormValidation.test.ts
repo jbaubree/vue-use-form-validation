@@ -134,4 +134,15 @@ describe('useFormValidation', () => {
     expect(errors.value).toEqual({ field1: 'Transformed error' })
     getErrorsSpy.mockRestore()
   })
+
+  it('should return the correct error message for a given field', async () => {
+    const mockErrors = { field1: 'Field1 is required', field2: 'Invalid email' }
+    vi.mocked(getErrors).mockResolvedValue(mockErrors)
+    const { validate, getErrorMessage } = useFormValidation(schema, form)
+    await validate()
+    expect(getErrorMessage('field1')).toBe('Field1 is required')
+    expect(getErrorMessage('field2')).toBe('Invalid email')
+    // @ts-expect-error field is invalid on purpose
+    expect(getErrorMessage('nonExistentField')).toBeUndefined()
+  })
 })
