@@ -30,14 +30,14 @@ npm install vue-use-form-validation
 Importing the Composable
 
 ```ts
-import { useFormValidation } from 'vue-use-form-validation';
+import { useFormValidation } from 'vue-use-form-validation'
 ```
 
 ## Types
 
 ```ts
 // Import types for better TypeScript support
-import type { FieldErrors, Form, GetErrorsFn, ReturnType, Schema } from './types';
+import type { FieldErrors, Form, GetErrorsFn, ReturnType, Schema } from './types'
 ```
 
 ## Basic Example
@@ -45,21 +45,21 @@ import type { FieldErrors, Form, GetErrorsFn, ReturnType, Schema } from './types
 This example shows how to use `vue-use-form-validation` with Zod for validation. However, you can use other validation libraries like Yup, Joi, Valibot, AJV, or Superstruct by adjusting the validation logic accordingly.
 
 ```ts
-import { ref } from 'vue';
-import * as z from 'zod';
-import { useFormValidation } from 'vue-use-form-validation';
+import { ref } from 'vue'
+import { useFormValidation } from 'vue-use-form-validation'
+import * as z from 'zod'
 
 // Define your schema
 const schema = z.object({
   field1: z.string().min(1, 'field1 is required'),
   field2: z.string().email('Invalid field2'),
-});
+})
 
 // Create a reactive form
 const form = ref({
   field1: '',
   field2: '',
-});
+})
 
 // Initialize the form validation
 const {
@@ -69,16 +69,16 @@ const {
   errorCount,
   clearErrors,
   getErrorMessage,
-} = useFormValidation(schema, form);
+} = useFormValidation(schema, form)
 
 // Submit your form
-const onSubmit = async () => {
-  await validate();
+async function onSubmit() {
+  await validate()
   if (!isValid.value) {
-    console.log(errors.value);
-    focusFirstErroredInput();
+    console.log(errors.value)
+    focusFirstErroredInput()
   }
-};
+}
 ```
 
 ## Options
@@ -88,11 +88,11 @@ const options = {
   mode: 'eager', // or 'lazy'
   transformFn: (schema: Schema, form: Form) => {
     // Custom validation logic
-    return {}; // Return errors if any
+    return {} // Return errors if any
   },
-};
+}
 
-const { validate } = useFormValidation(schema, form, options);
+const { validate } = useFormValidation(schema, form, options)
 ```
 
 ## Methods
@@ -106,14 +106,14 @@ const { validate } = useFormValidation(schema, form, options);
 ## API Reference
 
 ```ts
-useFormValidation<S, F extends Form>(
+declare function useFormValidation<S extends Schema<F>, F extends Form>(
   schema: S,
   form: MaybeRefOrGetter<F>,
   options?: {
-    mode?: 'eager' | 'lazy', // lazy by default
+    mode?: 'eager' | 'lazy' // lazy by default
     transformFn?: GetErrorsFn<S, F>
   }
-): ReturnType<F>`
+): ReturnType<F>
 ```
 
 #### Parameters
