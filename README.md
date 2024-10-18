@@ -11,14 +11,6 @@ A Vue 3 composable library for form validation, compatible with Zod, Yup, Joi, V
 
 ## Features
 
-⚡️ Automatic caching: Smart client-side caching with request deduplication
-🗄️ Async State: Handle any async state
-📚 Typescript Support: Fully typed with Typescript
-💨 Bundle Size: Small bundle size (<2kb) and fully tree-shakeable
-📦 Zero Dependencies: No dependencies other than Pinia
-⚙️ SSR: Server-side rendering support
-🔌 Plugins: Powerful plugin system
-
 - **⚡️ Compatibility**: Natively supports Zod, Yup, Joi, Valibot, AJV, and Superstruct.
 - **🧩 Type Safety**: Strongly typed with TypeScript, ensuring compile-time validation and reducing runtime errors.
 - **💨 Bundle Size**: Small bundle size (<3kb).
