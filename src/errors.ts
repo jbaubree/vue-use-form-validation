@@ -1,5 +1,4 @@
 import type { FieldErrors, Form, GetErrorsFn, Schema } from './types'
-import { getAjvErrors, isAjvSchema } from './ajv'
 import { getJoiErrors, isJoiSchema } from './joi'
 import { getSuperStructErrors, isSuperStructSchema } from './superstruct'
 import { getValibotErrors, isValibotSchema } from './valibot'
@@ -37,9 +36,6 @@ export async function getErrors<S, F extends Form>(
   }
   if (isSuperStructSchema<S, F>(schema)) {
     return getSuperStructErrors<S, F>(schema, form)
-  }
-  if (isAjvSchema<F>(schema)) {
-    return getAjvErrors<F>(schema, form)
   }
   return {}
 }

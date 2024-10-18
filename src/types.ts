@@ -1,4 +1,3 @@
-import type { JSONSchemaType } from 'ajv'
 import type { Schema as JoiSchema } from 'joi'
 import type { Struct } from 'superstruct'
 import type { BaseIssue, BaseSchema as ValibotSchema } from 'valibot'
@@ -18,7 +17,6 @@ export type Schema<F extends Form> =
   | ValibotSchema<unknown, unknown, BaseIssue<unknown>>
   | JoiSchema
   | Struct<F>
-  | JSONSchemaType<F>
 
 export interface ReturnType<F> {
   validate: () => Promise<FieldErrors<F>>

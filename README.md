@@ -7,11 +7,11 @@
 [![CI](https://github.com/jbaubree/vue-use-form-validation/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jbaubree/vue-use-form-validation/actions/workflows/ci.yml)
 [![Coverage](https://github.com/jbaubree/vue-use-form-validation/blob/main/badge.svg)](https://github.com/jbaubree/vue-use-form-validation/tree/main/test)
 
-A Vue 3 composable library for form validation, compatible with Zod, Yup, Joi, Valibot, AJV, and Superstruct. This library allows for seamless validation of forms and supports custom validation through a transformation function.
+A Vue 3 composable library for form validation, compatible with Zod, Yup, Joi, Valibot, and Superstruct. This library allows for seamless validation of forms and supports custom validation through a transformation function.
 
 ## Features
 
-- **⚡️ Compatibility**: Natively supports Zod, Yup, Joi, Valibot, AJV, and Superstruct.
+- **⚡️ Compatibility**: Natively supports Zod, Yup, Joi, Valibot, and Superstruct.
 - **🧩 Type Safety**: Strongly typed with TypeScript, ensuring compile-time validation and reducing runtime errors.
 - **💨 Bundle Size**: Small bundle size (<3kb).
 - **📦 Zero Dependencies**: No dependencies.
@@ -46,7 +46,7 @@ import type { FieldErrors, Form, GetErrorsFn, ReturnType, Schema } from './types
 
 ## Basic Example
 
-This example shows how to use `vue-use-form-validation` with Zod for validation. However, you can use other validation libraries like Yup, Joi, Valibot, AJV, or Superstruct by adjusting the validation logic accordingly.
+This example shows how to use `vue-use-form-validation` with Zod for validation. However, you can use other validation libraries like Yup, Joi, Valibot, or Superstruct by adjusting the validation logic accordingly.
 
 ```ts
 import { ref } from 'vue'

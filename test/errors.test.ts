@@ -1,11 +1,9 @@
-import type * as a from 'ajv'
 import { object as joiObject, string as joiString } from 'joi'
 import * as s from 'superstruct'
 import * as v from 'valibot'
 import { describe, expect, it, vi } from 'vitest'
 import * as yup from 'yup'
 import * as z from 'zod'
-import * as ajvModule from '../src/ajv'
 import { getErrors } from '../src/errors'
 import * as joiModule from '../src/joi'
 import * as superStructModule from '../src/superstruct'
@@ -48,13 +46,6 @@ vi.mock('../src/superstruct', async (importOriginal) => {
     getSuperStructErrors: vi.fn().mockResolvedValue({ field: 'Superstruct: required' }),
   }
 })
-vi.mock('../src/ajv', async (importOriginal) => {
-  const actual = await importOriginal<object>()
-  return {
-    ...actual,
-    getAjvErrors: vi.fn().mockResolvedValue({ field: 'Ajv: required' }),
-  }
-})
 
 describe('getErrors', () => {
   it('should call getZodErrors for Zod schemas', async () => {
@@ -95,21 +86,6 @@ describe('getErrors', () => {
     const errors = await getErrors(schema, form)
     expect(errors).toEqual({ field: 'Superstruct: required' })
     expect(superStructModule.getSuperStructErrors).toHaveBeenCalledWith(schema, form)
-  })
-
-  it('should call getAjvErrors for Ajv schemas', async () => {
-    const form = { field: '' }
-    const schema: a.JSONSchemaType<typeof form> = {
-      type: 'object',
-      properties: {
-        field: { type: 'string' },
-      },
-      required: ['field'],
-      additionalProperties: false,
-    }
-    const errors = await getErrors(schema, form)
-    expect(errors).toEqual({ field: 'Ajv: required' })
-    expect(ajvModule.getAjvErrors).toHaveBeenCalledWith(schema, form)
   })
 
   it('should return an empty object for unknown schemas', async () => {
