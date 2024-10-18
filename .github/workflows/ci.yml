@@ -40,10 +40,14 @@ jobs:
         uses: wjervis7/vitest-badge-action@v1.0.0
         if: ${{ matrix.node == 22 && matrix.os == 'ubuntu-latest' }}
         with:
-          result-type: lines
-          gist-token: ${{ secrets.GIST_TOKEN }}
-          gist-url: https://gist.github.com/jbaubree/49ef05b87cfb759d72800c33a6ead310
-          upload-badge: ${{ github.base_ref == 'refs/heads/main' }}
+          result-type: statements
+          upload-badge: false
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        if: ${{ matrix.node == 22 && matrix.os == 'ubuntu-latest' }}
+        with:
+          file_pattern: ./badge.svg
 
   lint:
     runs-on: ubuntu-latest
