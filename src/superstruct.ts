@@ -3,13 +3,11 @@ import type { FieldErrors, Form } from './types'
 import { isNonNullObject } from './utils'
 
 export function isSuperStructSchema<S, F extends Form>(schema: unknown): schema is Struct<F, S> {
-  return (
-    isNonNullObject(schema)
+  return isNonNullObject(schema)
     && 'schema' in schema
     && typeof schema.coercer === 'function'
     && typeof schema.validator === 'function'
     && typeof schema.refiner === 'function'
-  )
 }
 
 export function getSuperStructErrors<S, F extends Form>(schema: Struct<F, S>, form: F): FieldErrors<F> {
