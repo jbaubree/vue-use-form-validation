@@ -6,13 +6,7 @@ export default defineBuildConfig({
   ],
   declaration: true,
   clean: true,
-  externals: [
-    'joi',
-    'superstruct',
-    'valibot',
-    'yup',
-    'zod',
-  ],
+  externals: require('./constants.ts').EXTERNAL_LIBRARIES,
   rollup: {
     esbuild: {
       minify: true,

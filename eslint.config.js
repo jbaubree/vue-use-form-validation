@@ -5,4 +5,10 @@ export default antfu(
   {
     type: 'lib',
   },
+  {
+    files: ['**.config.ts'],
+    rules: {
+      'ts/no-require-imports': 'off',
+    },
+  },
 )
