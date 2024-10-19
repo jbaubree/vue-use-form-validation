@@ -4,11 +4,12 @@ export default defineBuildConfig({
   entries: [
     'src/index',
   ],
-  declaration: 'node16',
+  declaration: true,
   clean: true,
   rollup: {
     esbuild: {
       minify: true,
     },
+    emitCJS: true,
   },
 })

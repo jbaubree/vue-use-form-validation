@@ -10,6 +10,7 @@ export default defineConfig({
         '**\/*.d.ts',
         'test?(s)/**',
         '**/*.config.?(c|m)[jt]s?(x)',
+        'playground',
       ],
       enabled: true,
       reporter: ['json-summary', 'text'],
