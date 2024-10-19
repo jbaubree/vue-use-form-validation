@@ -17,19 +17,18 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
     }
   },
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "typesVersions": {
     "*": {
       "*": [
         "./dist/*",
-        "./dist/index.d.ts"
+        "./dist/index.d.mts"
       ]
     }
   },
@@ -48,7 +47,29 @@
     "prepare": "simple-git-hooks"
   },
   "peerDependencies": {
-    "vue": "^3.5.12"
+    "joi": "^17.13.3",
+    "superstruct": "^2.0.2",
+    "valibot": "^0.42.1",
+    "vue": "^3.5.12",
+    "yup": "^1.4.0",
+    "zod": "^3.23.8"
+  },
+  "peerDependenciesMeta": {
+    "joi": {
+      "optional": true
+    },
+    "superstruct": {
+      "optional": true
+    },
+    "valibot": {
+      "optional": true
+    },
+    "yup": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.7.3",
@@ -61,18 +82,13 @@
     "eslint": "^9.12.0",
     "esno": "^4.8.0",
     "happy-dom": "^15.7.4",
-    "joi": "^17.13.3",
     "lint-staged": "^15.2.10",
     "pnpm": "^9.12.1",
     "simple-git-hooks": "^2.11.1",
-    "superstruct": "^2.0.2",
     "typescript": "^5.6.3",
     "unbuild": "^2.0.0",
-    "valibot": "^0.42.1",
     "vite": "^5.4.9",
-    "vitest": "^2.1.3",
-    "yup": "^1.4.0",
-    "zod": "^3.23.8"
+    "vitest": "^2.1.3"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"

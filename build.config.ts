@@ -4,13 +4,11 @@ export default defineBuildConfig({
   entries: [
     'src/index',
   ],
-  declaration: true,
+  declaration: 'node16',
   clean: true,
-  externals: require('./constants.ts').EXTERNAL_LIBRARIES,
   rollup: {
     esbuild: {
       minify: true,
     },
-    emitCJS: true,
   },
 })
