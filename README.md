@@ -73,6 +73,7 @@ const {
   errorCount,
   clearErrors,
   getErrorMessage,
+  focusFirstErroredInput,
 } = useFormValidation(schema, form)
 
 // Submit your form

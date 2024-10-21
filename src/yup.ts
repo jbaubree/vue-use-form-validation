@@ -2,7 +2,7 @@ import type { ObjectSchema, ValidationError as YupError } from 'yup'
 import type { FieldErrors, Form } from './types'
 import { isNonNullObject } from './utils'
 
-export function isYupSchema<S extends object>(schema: unknown): schema is ObjectSchema<S> {
+export function isYupSchema<F extends object>(schema: unknown): schema is ObjectSchema<F> {
   return isNonNullObject(schema)
     && 'validate' in schema
     && '__isYupSchema__' in schema
