@@ -1,5 +1,12 @@
+// @unocss-include
+import { UnuseUI } from 'unuse-ui'
 import { createApp } from 'vue'
 
 import App from './App.vue'
 
-createApp(App).mount('#app')
+import 'unuse-ui/dist/style.css'
+import 'uno.css'
+
+createApp(App)
+  .use(UnuseUI)
+  .mount('#app')

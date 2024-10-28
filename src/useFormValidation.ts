@@ -1,5 +1,5 @@
 import type { FieldErrors, Form, GetErrorsFn, ReturnType, Schema } from './types'
-import { computed, type MaybeRefOrGetter, shallowRef, toValue, watch } from 'vue'
+import { computed, type MaybeRefOrGetter, ref, shallowRef, toValue, watch } from 'vue'
 import { getErrors } from './errors'
 import { polyfillGroupBy } from './polyfill'
 
@@ -22,6 +22,8 @@ export function useFormValidation<S extends Schema<F>, F extends Form>(
   const opts = Object.assign({}, { mode: 'lazy', transformFn: undefined }, options)
 
   const errors = shallowRef<FieldErrors<F>>({})
+
+  const isLoading = ref(false)
 
   const errorCount = computed(() => Object.keys(errors.value).length)
   const isValid = computed(() => !errorCount.value)
@@ -47,6 +49,7 @@ export function useFormValidation<S extends Schema<F>, F extends Form>(
   }
 
   const validate = async (): Promise<FieldErrors<F>> => {
+    isLoading.value = true
     clearErrors()
     errors.value = opts.transformFn
       ? await getErrors<S, F>(toValue(schema), toValue(form), opts.transformFn)
@@ -54,6 +57,7 @@ export function useFormValidation<S extends Schema<F>, F extends Form>(
     if (hasError.value) {
       validationWatch()
     }
+    isLoading.value = false
     return errors.value
   }
 
@@ -78,6 +82,7 @@ export function useFormValidation<S extends Schema<F>, F extends Form>(
     validate,
     errors,
     errorCount,
+    isLoading,
     isValid,
     hasError,
     clearErrors,

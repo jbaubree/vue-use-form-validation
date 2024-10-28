@@ -1,23 +1,74 @@
 <script setup lang="ts">
+import { UButton, UCard, UContainer, UFormGroup, UIcon, UInput, UNotifications, useToast, UText } from 'unuse-ui'
 import { ref } from 'vue'
 import { useFormValidation } from 'vue-use-form-validation'
 import * as z from 'zod'
 
+const toast = useToast()
+
 const schema = z.object({
-  field1: z.string().min(1, 'field1 is required'),
-  field2: z.string().email('Invalid field2'),
+  email: z.string().email(),
+  password: z.string().min(8),
 })
 
 const form = ref({
-  field1: '',
-  field2: '',
+  email: '',
+  password: '',
 })
 
-const { validate } = useFormValidation(schema, form)
+const {
+  errors,
+  errorCount,
+  hasError,
+  isLoading,
+  isValid,
+  focusFirstErroredInput,
+  focusInput,
+  getErrorMessage,
+  validate,
+} = useFormValidation(schema, form)
 
-await validate()
+async function onSubmit() {
+  await validate()
+  if (!isValid.value) {
+    focusFirstErroredInput()
+    return
+  }
+  toast.add({ title: 'Form is valid !', icon: 'icon-ph-check-circle', color: 'success' })
+}
 </script>
 
 <template>
-  Hi
+  <UContainer class="py-5">
+    <UText as="h1" label="Form example" class="mb-5" :ui="{ font: 'font-bold', size: 'text-2xl' }" />
+    <UCard v-if="hasError" class="mb-5" :ui="{ background: 'bg-red-200 dark:bg-red-600', body: { base: 'flex flex-col items-start gap-2' } }">
+      <UText :label="`Form has ${errorCount} ${errorCount > 1 ? 'errors' : 'error'}:`" :ui="{ font: 'font-bold', size: 'text-lg' }" class="mb-1" />
+      <div
+        v-for="
+          error, i in Object.keys(errors) as Array<keyof typeof errors>
+        "
+        :key="i"
+        class="flex items-center"
+      >
+        <UIcon name="icon-ph-dot-bold" color="dark" />
+        <UButton
+          class="ml-3" color="dark" :is-padded="false" variant="link"
+          :label="getErrorMessage(error)"
+          @click="focusInput({ inputName: error })"
+        />
+      </div>
+    </UCard>
+    <form class="flex flex-col gap-3">
+      <UFormGroup label="Email" :error="getErrorMessage('email')" is-required>
+        <UInput v-model="form.email" name="email" type="email" placeholder="email@email.com" autofocus size="md" />
+      </UFormGroup>
+      <UFormGroup label="Password" :error="getErrorMessage('password')" is-required>
+        <UInput v-model="form.password" name="password" type="password" placeholder="**********" size="md" />
+      </UFormGroup>
+      <UButton label="Submit" is-block :is-loading="isLoading" @click="onSubmit" />
+    </form>
+  </UContainer>
+  <Teleport to="body">
+    <UNotifications />
+  </Teleport>
 </template>

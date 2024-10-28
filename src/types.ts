@@ -22,7 +22,8 @@ export interface ReturnType<F> {
   validate: () => Promise<FieldErrors<F>>
   errors: Ref<FieldErrors<F>>
   errorCount: ComputedRef<number>
-  isValid: Ref<boolean>
+  isLoading: Ref<boolean>
+  isValid: ComputedRef<boolean>
   hasError: ComputedRef<boolean>
   clearErrors: () => void
   getErrorMessage: (path: keyof F) => string | undefined

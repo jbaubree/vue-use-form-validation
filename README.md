@@ -136,15 +136,16 @@ Returns an object containing the following properties:
 - `validate`: Function to validate the form.
 - `errors`: Reactive reference to the current validation errors.
 - `isValid`: Reactive reference indicating whether the form is valid.
+- `isLoading`: Reactive reference indicating if the form validation is in progress.
 - `errorCount`: Reactive reference to the number of errors.
 - `clearErrors`: Function to clear validation errors.
 - `getErrorMessage`: Function to get the error message for a specific field.
 - `focusFirstErroredInput`: Function to focus the first input with an error.
 - `focusInput`: Function to focus a specific input.
 
-## Example Tests
+## Example
 
-Refer to the `useFormValidation.test.ts` file for comprehensive test cases that demonstrate the functionality and usage of the composable.
+Refer to the `playground` folder for comprehensive use cases that demonstrate the functionality and usage of the composable.
 
 ## License
 
