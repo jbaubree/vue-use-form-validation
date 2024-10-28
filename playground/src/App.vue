@@ -41,7 +41,16 @@ async function onSubmit() {
 <template>
   <UContainer class="py-5">
     <UText as="h1" label="Form example" class="mb-5" :ui="{ font: 'font-bold', size: 'text-2xl' }" />
-    <UCard v-if="hasError" class="mb-5" :ui="{ background: 'bg-red-200 dark:bg-red-600', body: { base: 'flex flex-col items-start gap-2' } }">
+    <form class="flex flex-col gap-3 mb-5">
+      <UFormGroup label="Email" :error="getErrorMessage('email')" is-required>
+        <UInput v-model="form.email" name="email" type="email" placeholder="email@email.com" autofocus size="md" />
+      </UFormGroup>
+      <UFormGroup label="Password" :error="getErrorMessage('password')" is-required>
+        <UInput v-model="form.password" name="password" type="password" placeholder="**********" size="md" />
+      </UFormGroup>
+      <UButton label="Submit" color="pilot" is-block :is-loading="isLoading" @click="onSubmit" />
+    </form>
+    <UCard v-if="hasError" :ui="{ background: 'bg-red-200 dark:bg-red-600', body: { base: 'flex flex-col items-start gap-2' } }">
       <UText :label="`Form has ${errorCount} ${errorCount > 1 ? 'errors' : 'error'}:`" :ui="{ font: 'font-bold', size: 'text-lg' }" class="mb-1" />
       <div
         v-for="
@@ -58,15 +67,6 @@ async function onSubmit() {
         />
       </div>
     </UCard>
-    <form class="flex flex-col gap-3">
-      <UFormGroup label="Email" :error="getErrorMessage('email')" is-required>
-        <UInput v-model="form.email" name="email" type="email" placeholder="email@email.com" autofocus size="md" />
-      </UFormGroup>
-      <UFormGroup label="Password" :error="getErrorMessage('password')" is-required>
-        <UInput v-model="form.password" name="password" type="password" placeholder="**********" size="md" />
-      </UFormGroup>
-      <UButton label="Submit" is-block :is-loading="isLoading" @click="onSubmit" />
-    </form>
   </UContainer>
   <Teleport to="body">
     <UNotifications />
