@@ -7,4 +7,13 @@ export default defineConfig({
     Vue(),
     Unocss(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'unuse-ui': ['unuse-ui'],
+        },
+      },
+    },
+  },
 })

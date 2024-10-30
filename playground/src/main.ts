@@ -4,9 +4,9 @@ import { createApp } from 'vue'
 
 import App from './App.vue'
 
-import 'unuse-ui/dist/style.css'
+import 'unuse-ui/dist/assets/style.css'
 import 'uno.css'
 
 createApp(App)
-  .use(UnuseUI)
+  .use(UnuseUI, { registerComponents: false })
   .mount('#app')

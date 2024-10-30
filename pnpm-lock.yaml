@@ -101,8 +101,8 @@ importers:
         specifier: ^0.63.6
         version: 0.63.6(postcss@8.4.47)(rollup@4.21.2)(typescript@5.5.4)(vite@5.4.9(@types/node@20.16.13))
       unuse-ui:
-        specifier: ^0.1.24
-        version: 0.1.24(typescript@5.5.4)
+        specifier: ^0.2.1
+        version: 0.2.1(typescript@5.5.4)
       vite:
         specifier: ^5.4.8
         version: 5.4.9(@types/node@20.16.13)
@@ -3553,8 +3553,8 @@ packages:
     resolution: {integrity: sha512-reBOnkJBFfBZ8pCKaeHgfZLcehXtM6UTxc+vqs1JvCps0c4amLNp3fhdGBZwYp+VLyoY9n3X5KOP7lCyWBUX9A==}
     hasBin: true
 
-  unuse-ui@0.1.24:
-    resolution: {integrity: sha512-k9xBM9HdmGQuNH9HE18pdL0dKCDA+vo1e8obh5jOYV3vJO17SHrpAvARt2+KsP6M3gWMRsVb4LyPn08/tlVdtA==}
+  unuse-ui@0.2.1:
+    resolution: {integrity: sha512-l0TbOAxErC8w3EMa0UZHJmHJxvf1ioKGjNDXstpXs/8lXZnnwdcQYcM+e8Kax0S0YHRyzXGNDGpYObBDgWsjRw==}
 
   update-browserslist-db@1.1.1:
     resolution: {integrity: sha512-R8UzCaa9Az+38REPiJ1tXlImTJXlVfgHZsglwBD/k6nj76ctsH1E3q4doGrukiLQd3sGQYu56r5+lo5r94l29A==}
@@ -7476,7 +7476,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  unuse-ui@0.1.24(typescript@5.5.4):
+  unuse-ui@0.2.1(typescript@5.5.4):
     dependencies:
       '@headlessui/vue': 1.7.23(vue@3.5.12(typescript@5.5.4))
       '@iconify-json/ph': 1.2.1
