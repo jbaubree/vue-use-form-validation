@@ -4,7 +4,6 @@ export default defineBuildConfig({
   entries: [
     'src/index',
   ],
-  declaration: true,
   clean: true,
   rollup: {
     esbuild: {
@@ -12,4 +11,5 @@ export default defineBuildConfig({
     },
     emitCJS: true,
   },
+  failOnWarn: false,
 })

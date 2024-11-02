@@ -1,22 +1,38 @@
-import type { Schema as JoiSchema } from 'joi'
-import type { Struct } from 'superstruct'
-import type { BaseIssue, BaseSchema as ValibotSchema } from 'valibot'
+import type { Schema } from 'joi'
 import type { ComputedRef, Ref } from 'vue'
-import type { ObjectSchema as YupSchema } from 'yup'
-import type { ZodSchema } from 'zod'
+
+type AnyObject = Record<string, any>
+
+interface ZodSchema<F> extends AnyObject {
+  shape: Record<keyof F, unknown>
+}
+interface YupSchema<F> extends AnyObject {
+  fields: Record<keyof F, unknown>
+}
+interface ValibotSchema<F> extends AnyObject {
+  entries: Record<keyof F, unknown>
+}
+// interface JoiTerms<F> extends AnyObject {
+//   keys: Array<{ key: keyof F, schema: unknown }>
+// }
+// interface JoiSchema<F> extends AnyObject {
+//   $_terms: JoiTerms<F>
+// }
+interface SuperstructSchema<F> extends AnyObject {
+  schema: Record<keyof F, unknown>
+}
 
 export type Awaitable<T> = T | PromiseLike<T>
-
 export type FieldErrors<F> = Partial<Record<keyof F, string>>
 export type Form = Record<string, unknown>
 export type GetErrorsFn<S, F extends Form> = (schema: S, form: F) => Awaitable<FieldErrors<F>>
 
-export type Schema<F extends Form> =
-  | ZodSchema
+export type InputSchema<F extends Form> =
+  | ZodSchema<F>
   | YupSchema<F>
-  | ValibotSchema<unknown, unknown, BaseIssue<unknown>>
-  | JoiSchema
-  | Struct<F>
+  | ValibotSchema<F>
+  | Schema<F>
+  | SuperstructSchema<F>
 
 export interface ReturnType<F> {
   validate: () => Promise<FieldErrors<F>>

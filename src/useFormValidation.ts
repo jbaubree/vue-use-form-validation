@@ -1,4 +1,4 @@
-import type { FieldErrors, Form, GetErrorsFn, ReturnType, Schema } from './types'
+import type { FieldErrors, Form, GetErrorsFn, InputSchema, ReturnType } from './types'
 import { computed, type MaybeRefOrGetter, ref, shallowRef, toValue, watch } from 'vue'
 import { getErrors } from './errors'
 import { polyfillGroupBy } from './polyfill'
@@ -8,12 +8,12 @@ export function useFormValidation<S, F extends Form>(
   form: MaybeRefOrGetter<F>,
   options: { mode?: 'eager' | 'lazy', transformFn: GetErrorsFn<S, F> },
 ): ReturnType<F>
-export function useFormValidation<S extends Schema<F>, F extends Form>(
+export function useFormValidation<S extends InputSchema<F>, F extends Form>(
   schema: S,
   form: MaybeRefOrGetter<F>,
   options?: { mode?: 'eager' | 'lazy' },
 ): ReturnType<F>
-export function useFormValidation<S extends Schema<F>, F extends Form>(
+export function useFormValidation<S extends InputSchema<F>, F extends Form>(
   schema: S,
   form: MaybeRefOrGetter<F>,
   options?: { mode?: 'eager' | 'lazy', transformFn?: GetErrorsFn<S, F> },

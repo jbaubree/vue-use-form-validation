@@ -41,7 +41,7 @@ import { useFormValidation } from 'vue-use-form-validation'
 
 ```ts
 // Import types for better TypeScript support
-import type { FieldErrors, Form, GetErrorsFn, ReturnType, Schema } from './types'
+import type { FieldErrors, Form, GetErrorsFn, InputSchema, ReturnType } from './types'
 ```
 
 ## Basic Example
@@ -91,7 +91,7 @@ async function onSubmit() {
 ```ts
 const options = {
   mode: 'eager', // or 'lazy'
-  transformFn: (schema: Schema, form: Form) => {
+  transformFn: (schema: InputSchema, form: Form) => {
     // Custom validation logic
     return {} // Return errors if any
   },
@@ -111,7 +111,7 @@ const { validate } = useFormValidation(schema, form, options)
 ## API Reference
 
 ```ts
-declare function useFormValidation<S extends Schema<F>, F extends Form>(
+declare function useFormValidation<S extends InputSchema<F>, F extends Form>(
   schema: S,
   form: MaybeRefOrGetter<F>,
   options?: {

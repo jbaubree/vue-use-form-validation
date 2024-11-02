@@ -1,11 +1,11 @@
-import type { FieldErrors, Form, GetErrorsFn, Schema } from './types'
+import type { FieldErrors, Form, GetErrorsFn, InputSchema } from './types'
 import { getJoiErrors, isJoiSchema } from './joi'
 import { getSuperStructErrors, isSuperStructSchema } from './superstruct'
 import { getValibotErrors, isValibotSchema } from './valibot'
 import { getYupErrors, isYupSchema } from './yup'
 import { getZodErrors, isZodSchema } from './zod'
 
-export async function getErrors<S extends Schema<F>, F extends Form>(
+export async function getErrors<S extends InputSchema<F>, F extends Form>(
   schema: S,
   form: F,
 ): Promise<FieldErrors<F>>
