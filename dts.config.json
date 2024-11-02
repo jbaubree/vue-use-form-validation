@@ -9,13 +9,7 @@
       "outFile": "./dist/index.d.ts",
       "libraries": {
         "importedLibraries": ["vue"],
-        "inlinedLibraries": [
-          "joi",
-          "superstruct",
-          "valibot",
-          "yup",
-          "zod"
-        ]
+        "inlinedLibraries": ["joi"]
       },
       "output": {
         "exportReferencedTypes": false
