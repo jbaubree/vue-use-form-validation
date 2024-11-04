@@ -1,16 +1,11 @@
 export function polyfillGroupBy<T>(): void {
   if (!Object.groupBy) {
     Object.defineProperty(Object, 'groupBy', {
-      value(array: T[], keyGetter: (item: T) => string): Record<string, T[]> {
-        return array.reduce((result, currentItem) => {
-          const key = keyGetter(currentItem)
-          if (!result[key]) {
-            result[key] = []
-          }
-          result[key].push(currentItem)
-          return result
-        }, {} as Record<string, T[]>)
-      },
+      value: (array: T[], keyGetter: (item: T) => string): Record<string, T[]> => array.reduce((result: Record<string, T[]>, item: T) => {
+        const key = keyGetter(item);
+        (result[key] ??= []).push(item)
+        return result
+      }, {}),
       writable: true,
       configurable: true,
     })

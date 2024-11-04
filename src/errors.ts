@@ -1,9 +1,5 @@
 import type { FieldErrors, Form, GetErrorsFn, InputSchema } from './types'
-import { getJoiErrors, isJoiSchema } from './joi'
-import { getSuperStructErrors, isSuperStructSchema } from './superstruct'
-import { getValibotErrors, isValibotSchema } from './valibot'
-import { getYupErrors, isYupSchema } from './yup'
-import { getZodErrors, isZodSchema } from './zod'
+import { validators } from './validators'
 
 export async function getErrors<S extends InputSchema<F>, F extends Form>(
   schema: S,
@@ -19,23 +15,12 @@ export async function getErrors<S, F extends Form>(
   form: F,
   transformFn?: GetErrorsFn<S, F>,
 ): Promise<FieldErrors<F>> {
-  if (transformFn) {
+  if (transformFn)
     return await transformFn(schema, form)
-  }
-  if (isZodSchema(schema)) {
-    return await getZodErrors<F>(schema, form)
-  }
-  if (isYupSchema<F>(schema)) {
-    return await getYupErrors<F>(schema, form)
-  }
-  if (isJoiSchema(schema)) {
-    return await getJoiErrors<F>(schema, form)
-  }
-  if (isValibotSchema(schema)) {
-    return getValibotErrors<F>(schema, form)
-  }
-  if (isSuperStructSchema<S, F>(schema)) {
-    return getSuperStructErrors<S, F>(schema, form)
+  for (const validator of Object.values(validators)) {
+    if (validator.check(schema)) {
+      return await validator.getErrors(schema, form)
+    }
   }
   return {}
 }

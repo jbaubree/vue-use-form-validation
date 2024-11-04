@@ -19,7 +19,7 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
   options?: { mode?: 'eager' | 'lazy', transformFn?: GetErrorsFn<S, F> },
 ): ReturnType<F> {
   polyfillGroupBy()
-  const opts = Object.assign({}, { mode: 'lazy', transformFn: undefined }, options)
+  const opts = { mode: 'lazy', transformFn: null, ...options }
 
   const errors = shallowRef<FieldErrors<F>>({})
 
@@ -34,36 +34,22 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
   }
   const getErrorMessage = (path: keyof F): string | undefined => errors.value[path]
 
-  let unwatch: null | (() => void) = null
-  const validationWatch: () => void = () => {
-    if (unwatch !== null)
-      return
-    unwatch = watch(
-      () => toValue(form),
-      async () => {
-        // eslint-disable-next-line ts/no-use-before-define
-        await validate()
-      },
-      { deep: true },
-    )
-  }
-
   const validate = async (): Promise<FieldErrors<F>> => {
     isLoading.value = true
     clearErrors()
     errors.value = opts.transformFn
       ? await getErrors<S, F>(toValue(schema), toValue(form), opts.transformFn)
       : await getErrors<S, F>(toValue(schema), toValue(form))
-    if (hasError.value) {
-      validationWatch()
-    }
+
+    if (hasError.value)
+    // eslint-disable-next-line ts/no-use-before-define
+      watchFormChanges()
     isLoading.value = false
     return errors.value
   }
 
   const focusInput = ({ inputName }: { inputName: keyof F }): void => {
-    const element: HTMLInputElement | null = document.querySelector(`input[name="${inputName.toString()}"]`)
-    element?.focus()
+    (document.querySelector(`input[name="${inputName.toString()}"]`) as HTMLInputElement | null)?.focus()
   }
   const focusFirstErroredInput = (): void => {
     for (const key in toValue(form)) {
@@ -74,9 +60,14 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
     }
   }
 
-  if (opts.mode === 'eager') {
-    validationWatch()
+  let unwatch: null | (() => void)
+  const watchFormChanges = (): void | (() => void) => {
+    if (!unwatch)
+      unwatch = watch(() => toValue(form), validate, { deep: true })
   }
+
+  if (opts.mode === 'eager')
+    watchFormChanges()
 
   return {
     validate,

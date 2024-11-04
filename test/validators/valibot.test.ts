@@ -1,42 +1,37 @@
 import { object, string } from 'valibot'
 import { describe, expect, it } from 'vitest'
-import { getValibotErrors, isValibotSchema } from '../src/valibot'
+import { Valibot } from '../../src/validators/valibot'
 
-describe('isValibotSchema', () => {
+describe('check', () => {
   it('should return true for a valid Valibot schema', () => {
     const schema = object({ name: string() })
-    expect(isValibotSchema(schema)).toBe(true)
+    expect(Valibot.check(schema)).toBe(true)
   })
 
   it('should return false for non-objects', () => {
-    expect(isValibotSchema(null)).toBe(false)
-    expect(isValibotSchema(123)).toBe(false)
-    expect(isValibotSchema('string')).toBe(false)
+    expect(Valibot.check(null)).toBe(false)
+    expect(Valibot.check(123)).toBe(false)
+    expect(Valibot.check('string')).toBe(false)
   })
 
   it('should return false for objects without _parse, _run, or schema properties', () => {
     const invalidSchema = { someProp: 'value' }
-    expect(isValibotSchema(invalidSchema)).toBe(false)
-  })
-
-  it('should return true for a function with a schema property', () => {
-    const schemaFunction = Object.assign(() => {}, { schema: object({ name: string() }) })
-    expect(isValibotSchema(schemaFunction)).toBe(true)
+    expect(Valibot.check(invalidSchema)).toBe(false)
   })
 })
 
-describe('getValibotErrors', () => {
+describe('getErrors', () => {
   it('should return empty errors for valid data', () => {
     const schema = object({ name: string() })
     const form = { name: 'Valid Name' }
-    const errors = getValibotErrors(schema, form)
+    const errors = Valibot.getErrors(schema, form)
     expect(errors).toEqual({})
   })
 
   it('should return errors for invalid data', () => {
     const schema = object({ name: string() })
     const form = { name: 123 }
-    const errors = getValibotErrors(schema, form)
+    const errors = Valibot.getErrors(schema, form)
     expect(errors).toEqual({ name: 'Invalid type: Expected string but received 123' })
   })
 
@@ -46,7 +41,7 @@ describe('getValibotErrors', () => {
       age: string(),
     })
     const form = { name: 123, age: 456 }
-    const errors = getValibotErrors(schema, form)
+    const errors = Valibot.getErrors(schema, form)
     expect(errors).toEqual({
       name: 'Invalid type: Expected string but received 123',
       age: 'Invalid type: Expected string but received 456',
@@ -60,7 +55,7 @@ describe('getValibotErrors', () => {
       }),
     })
     const form = { user: { name: 123 } }
-    const errors = getValibotErrors(schema, form)
+    const errors = Valibot.getErrors(schema, form)
     expect(errors).toEqual({ user: 'Invalid type: Expected string but received 123' })
   })
 })

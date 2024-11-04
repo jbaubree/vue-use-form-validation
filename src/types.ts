@@ -12,16 +12,11 @@ interface YupSchema<F> extends AnyObject {
 interface ValibotSchema<F> extends AnyObject {
   entries: Record<keyof F, unknown>
 }
-// interface JoiTerms<F> extends AnyObject {
-//   keys: Array<{ key: keyof F, schema: unknown }>
-// }
-// interface JoiSchema<F> extends AnyObject {
-//   $_terms: JoiTerms<F>
-// }
 interface SuperstructSchema<F> extends AnyObject {
   schema: Record<keyof F, unknown>
 }
 
+export type Validator = 'Joi' | 'SuperStruct' | 'Valibot' | 'Yup' | 'Zod'
 export type Awaitable<T> = T | PromiseLike<T>
 export type FieldErrors<F> = Partial<Record<keyof F, string>>
 export type Form = Record<string, unknown>
