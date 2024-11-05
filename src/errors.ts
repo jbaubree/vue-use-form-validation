@@ -1,25 +1,20 @@
+import type { MaybeRefOrGetter } from 'vue'
 import type { FieldErrors, Form, GetErrorsFn, InputSchema } from './types'
+import { toValue } from 'vue'
 import { validators } from './validators'
 
 export async function getErrors<S extends InputSchema<F>, F extends Form>(
   schema: S,
-  form: F,
-): Promise<FieldErrors<F>>
-export async function getErrors<S, F extends Form>(
-  schema: S,
-  form: F,
-  transformFn: GetErrorsFn<S, F>,
-): Promise<FieldErrors<F>>
-export async function getErrors<S, F extends Form>(
-  schema: S,
-  form: F,
-  transformFn?: GetErrorsFn<S, F>,
+  form: MaybeRefOrGetter<F>,
+  transformFn: GetErrorsFn<S, F> | null,
 ): Promise<FieldErrors<F>> {
+  const formValue = toValue(form)
+  const schemaValue = toValue(schema)
   if (transformFn)
-    return await transformFn(schema, form)
+    return await transformFn(schemaValue, formValue)
   for (const validator of Object.values(validators)) {
-    if (validator.check(schema)) {
-      return await validator.getErrors(schema, form)
+    if (validator.check(schemaValue)) {
+      return await validator.getErrors(schemaValue, formValue)
     }
   }
   return {}

@@ -17,6 +17,7 @@ interface SuperstructSchema<F> extends AnyObject {
 }
 
 export type Validator = 'Joi' | 'SuperStruct' | 'Valibot' | 'Yup' | 'Zod'
+export type ValidationMode = 'eager' | 'lazy' | 'agressive' | 'onBlur'
 export type Awaitable<T> = T | PromiseLike<T>
 export type FieldErrors<F> = Partial<Record<keyof F, string>>
 export type Form = Record<string, unknown>

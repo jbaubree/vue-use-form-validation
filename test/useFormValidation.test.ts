@@ -1,6 +1,6 @@
 import type { Ref } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { ref, toValue } from 'vue'
+import { ref } from 'vue'
 import * as z from 'zod'
 import * as errorModule from '../src/errors'
 import { getErrors } from '../src/errors'
@@ -31,6 +31,10 @@ describe('useFormValidation', () => {
       field2: '',
     })
     vi.clearAllMocks()
+    document.body.innerHTML = `
+      <input name="field1" />
+      <input name="field2" />
+    `
   })
 
   it('should initialize with no errors', () => {
@@ -45,7 +49,7 @@ describe('useFormValidation', () => {
     vi.mocked(getErrors).mockResolvedValue(mockErrors)
     const { validate, errors, isValid, errorCount } = useFormValidation(schema, form)
     await validate()
-    expect(getErrors).toHaveBeenCalledWith(schema, toValue(form))
+    expect(getErrors).toHaveBeenCalledWith(schema, form, null)
     expect(errors.value).toEqual(mockErrors)
     expect(isValid.value).toBe(false)
     expect(errorCount.value).toBe(1)
@@ -62,11 +66,6 @@ describe('useFormValidation', () => {
   })
 
   it('should focus the first errored input', async () => {
-    document.body.innerHTML = `
-      <input name="field1" />
-      <input name="field2" />
-    `
-
     const mockErrors = { field1: 'Required' }
     vi.mocked(getErrors).mockResolvedValue(mockErrors)
     const { validate, focusFirstErroredInput } = useFormValidation(schema, form)
@@ -79,11 +78,6 @@ describe('useFormValidation', () => {
   })
 
   it('should focus the input when focusInput is called with inputName', () => {
-    document.body.innerHTML = `
-      <input name="field1" />
-      <input name="field2" />
-    `
-
     const { focusInput } = useFormValidation(schema, form)
     const input: HTMLInputElement | null = document.querySelector('input[name="field1"]')
     expect(input).toBeDefined()
@@ -101,7 +95,7 @@ describe('useFormValidation', () => {
     expect(errors.value).toEqual({ field1: 'Required' })
     expect(isValid.value).toBe(false)
     expect(errorCount.value).toBe(1)
-    expect(getErrors).toHaveBeenCalledWith(schema, toValue(form))
+    expect(getErrors).toHaveBeenCalledWith(schema, form, null)
   })
 
   it('should update errors in real-time when form changes in eager mode', async () => {
@@ -130,7 +124,7 @@ describe('useFormValidation', () => {
       },
     })
     await validate()
-    expect(getErrorsSpy).toHaveBeenCalledWith(schema, toValue(form), expect.any(Function))
+    expect(getErrorsSpy).toHaveBeenCalledWith(schema, form, expect.any(Function))
     expect(errors.value).toEqual({ field1: 'Transformed error' })
     getErrorsSpy.mockRestore()
   })
@@ -144,5 +138,29 @@ describe('useFormValidation', () => {
     expect(getErrorMessage('field2')).toBe('Invalid email')
     // @ts-expect-error field is invalid on purpose
     expect(getErrorMessage('nonExistentField')).toBeUndefined()
+  })
+
+  it('should add blur event listeners to inputs in onBlur mode', () => {
+    const input1 = document.querySelector<HTMLInputElement>('input[name="field1"]')
+    const input2 = document.querySelector<HTMLInputElement>('input[name="field2"]')
+    expect(input1).toBeDefined()
+    expect(input2).toBeDefined()
+    const blurSpy1 = vi.spyOn(input1 as HTMLInputElement, 'addEventListener')
+    const blurSpy2 = vi.spyOn(input2 as HTMLInputElement, 'addEventListener')
+    useFormValidation(schema, form, { mode: 'onBlur' })
+    expect(blurSpy1).toHaveBeenCalledWith('blur', expect.any(Function))
+    expect(blurSpy2).toHaveBeenCalledWith('blur', expect.any(Function))
+  })
+
+  it('should update errors only for the blurred field in onBlur mode', async () => {
+    const mockErrors = { field1: 'field1 is required' }
+    vi.spyOn(errorModule, 'getErrors').mockResolvedValue(mockErrors)
+    const { errors } = useFormValidation(schema, form, { mode: 'onBlur' })
+    const input1 = document.querySelector<HTMLInputElement>('input[name="field1"]')
+    expect(input1).toBeDefined()
+    input1?.dispatchEvent(new Event('blur'))
+    await flushPromises()
+    expect(errors.value).toEqual({ field1: 'field1 is required' })
+    expect(errors.value.field2).toBeUndefined()
   })
 })
