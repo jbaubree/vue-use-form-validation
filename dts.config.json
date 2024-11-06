@@ -5,6 +5,7 @@
   },
   "entries": [
     {
+      "noCheck": true,
       "filePath": "./src/index.ts",
       "outFile": "./dist/index.d.ts",
       "libraries": {
