@@ -36,9 +36,7 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
 
   const validate = async (): Promise<FieldErrors<F>> => {
     isLoading.value = true
-    clearErrors()
     errors.value = await getErrors(schema, form, opts.transformFn)
-
     if (hasError.value)
     // eslint-disable-next-line ts/no-use-before-define
       watchFormChanges()
