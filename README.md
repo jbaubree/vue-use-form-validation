@@ -16,7 +16,7 @@ A Vue 3 composable library for form validation, compatible with Zod, Yup, Joi, V
 - **💨 Bundle Size**: Small bundle size (<3kb).
 - **📦 Zero Dependencies**: No dependencies.
 - **✅ Custom Validation**: Compatible with any other validation libraries using `transformFn`.
-- **⚙️ Customizable Validation Modes**: Offers 'eager' and 'lazy' validation modes to fit different user experience needs.
+- **⚙️ Customizable Validation Modes**: Offers eager, lazy, agressive and onBlur validation modes to fit different user experience needs.
 - **🔗 Reactive Integration**: Fully integrates with Vue’s reactivity system, providing a seamless experience when working with reactive form states.
 - **📈 Performance Optimized**: Efficiently handles validation with minimal performance overhead, making it suitable for large forms.
 - **📅 Easy Integration**: Simple to integrate with existing Vue 3 projects, requiring minimal setup to start validating forms.
@@ -90,7 +90,7 @@ async function onSubmit() {
 
 ```ts
 const options = {
-  mode: 'eager', // or 'lazy'
+  mode: 'eager', // or 'lazy' or 'agressive' or 'onBlur'
   transformFn: (schema: InputSchema, form: Form) => {
     // Custom validation logic
     return {} // Return errors if any
@@ -115,7 +115,7 @@ declare function useFormValidation<S extends InputSchema<F>, F extends Form>(
   schema: S,
   form: MaybeRefOrGetter<F>,
   options?: {
-    mode?: 'eager' | 'lazy' // lazy by default
+    mode?: 'eager' | 'lazy' | 'agressive' | 'onBlur' // lazy by default
     transformFn?: GetErrorsFn<S, F>
   }
 ): ReturnType<F>
@@ -126,7 +126,7 @@ declare function useFormValidation<S extends InputSchema<F>, F extends Form>(
 - **schema**: The validation schema.
 - **form**: The reactive form object.
 - **options**: Optional configuration object.
-  - **mode**: (optional) Validation mode (`'eager'` for immediate validation or `'lazy'` for validation on form changes).
+  - **mode**: (optional) Validation mode (`'eager'` for immediate validation,`'agressive'` for validation on load, `'lazy'` for validation on form changes or `'onBlur'` for validation on input blur).
   - **transformFn**: (optional) A transformation function that can be used when integrating a different validation library. It allows you to transform data before it is validated. Use this option only if you are integrating another validation library that requires specific data handling.
 
 #### Return Value
