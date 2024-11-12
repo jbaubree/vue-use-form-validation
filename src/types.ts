@@ -3,9 +3,9 @@ import type { ComputedRef, Ref } from 'vue'
 
 type AnyObject = Record<string, any>
 
-interface ZodSchema<F> extends AnyObject {
-  shape: Record<keyof F, unknown>
-}
+interface ZodShape<F> extends AnyObject { shape: Record<keyof F, unknown> }
+
+type ZodSchema<F> = AnyObject & (ZodShape<F> | { _def: { schema: ZodShape<F> } })
 interface YupSchema<F> extends AnyObject {
   fields: Record<keyof F, unknown>
 }
