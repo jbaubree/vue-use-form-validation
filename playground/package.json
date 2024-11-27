@@ -11,6 +11,8 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "@vueuse/head": "^2.0.0",
+    "unuse-ui": "^0.3.0",
     "vue": "^3.5.12"
   },
   "devDependencies": {
@@ -20,7 +22,6 @@
     "@vue/tsconfig": "^0.5.1",
     "typescript": "~5.5.4",
     "unocss": "^0.63.6",
-    "unuse-ui": "^0.2.1",
     "vite": "^5.4.8",
     "vue-tsc": "^2.1.6",
     "vue-use-form-validation": "workspace:*",

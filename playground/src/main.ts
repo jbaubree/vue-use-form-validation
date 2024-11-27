@@ -8,5 +8,5 @@ import 'unuse-ui/dist/assets/style.css'
 import 'uno.css'
 
 createApp(App)
-  .use(UnuseUI, { registerComponents: false })
+  .use(UnuseUI)
   .mount('#app')
