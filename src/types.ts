@@ -19,8 +19,22 @@ interface SuperstructSchema<F> extends AnyObject {
 export type Validator = 'Joi' | 'SuperStruct' | 'Valibot' | 'Yup' | 'Zod'
 export type ValidationMode = 'eager' | 'lazy' | 'agressive' | 'onBlur'
 export type Awaitable<T> = T | PromiseLike<T>
-export type FieldErrors<F> = Partial<Record<keyof F, string>>
 export type ErrorStrategy = 'flatten' | 'deep'
+
+type DeepErrors<T> = {
+  [K in keyof T]?: T[K] extends Record<string, any>
+    ? DeepErrors<T[K]>
+    : string
+}
+export type FieldErrors<F, Strategy extends ErrorStrategy = ErrorStrategy> =
+  Strategy extends 'flatten'
+    ? Partial<Record<keyof F, string>>
+    : {
+        [K in keyof F]?: F[K] extends Record<string, any>
+          ? DeepErrors<F[K]>
+          : string
+      }
+
 export type Form = Record<string, unknown>
 export type GetErrorsFn<S, F extends Form> = (schema: S, form: F, errorStrategy: ErrorStrategy) => Awaitable<FieldErrors<F>>
 
@@ -31,15 +45,16 @@ export type InputSchema<F extends Form> =
   | Schema<F>
   | SuperstructSchema<F>
 
-export interface ReturnType<F> {
-  validate: () => Promise<FieldErrors<F>>
-  errors: Ref<FieldErrors<F>>
+export interface ReturnType<F, Strategy extends ErrorStrategy = ErrorStrategy> {
+  validate: () => Promise<FieldErrors<F, Strategy>>
+  errors: Ref<FieldErrors<F, Strategy>>
   errorCount: ComputedRef<number>
   isLoading: Ref<boolean>
   isValid: ComputedRef<boolean>
   hasError: ComputedRef<boolean>
   clearErrors: () => void
-  getErrorMessage: (path: keyof F) => string | undefined
+  getErrorMessage: (path: keyof F | string) => string | undefined
+  errorPaths: ComputedRef<string[]>
   focusFirstErroredInput: () => void
-  focusInput: (options: { inputName: keyof F }) => void
+  focusInput: (options: { inputName: keyof F | string }) => void
 }

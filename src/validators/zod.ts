@@ -9,7 +9,7 @@ export const Zod = {
     const result = await schema.safeParseAsync(form)
     result.error?.issues.forEach((i) => {
       if (errorStrategy === 'flatten') {
-        errors[i.path[0] as keyof F] = i.message
+        errors[i.path[0] as keyof F] = i.message as FieldErrors<F>[keyof F]
       }
       else {
         const path = i.path.join('.')

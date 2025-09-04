@@ -14,7 +14,7 @@ export const Joi = {
       if (Joi.errorCheck(error)) {
         error.details.forEach((i) => {
           if (errorStrategy === 'flatten') {
-            errors[i.path[0] as keyof F] = i.message
+            errors[i.path[0] as keyof F] = i.message as FieldErrors<F>[keyof F]
           }
           else {
             const path = i.path.join('.')

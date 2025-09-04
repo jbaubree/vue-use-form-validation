@@ -13,7 +13,7 @@ export const Yup = {
     catch (error) {
       if (Yup.errorCheck(error)) {
         if (errorStrategy === 'flatten') {
-          error.inner.forEach(i => errors[i.path?.split('.')[0] as keyof F] = i.message)
+          error.inner.forEach(i => errors[i.path?.split('.')[0] as keyof F] = i.message as FieldErrors<F>[keyof F])
         }
         else {
           error.inner.forEach((i) => {

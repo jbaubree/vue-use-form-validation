@@ -4,6 +4,31 @@ import { getErrors } from './errors'
 import { polyfillGroupBy } from './polyfill'
 import { getInput } from './utils'
 
+// Overload for deep strategy
+export function useFormValidation<S extends InputSchema<F>, F extends Form>(
+  schema: S,
+  form: MaybeRefOrGetter<F>,
+  options: { mode?: ValidationMode, transformFn: GetErrorsFn<S, F>, errorStrategy: 'deep' },
+): ReturnType<F, 'deep'>
+export function useFormValidation<S extends InputSchema<F>, F extends Form>(
+  schema: S,
+  form: MaybeRefOrGetter<F>,
+  options: { mode?: ValidationMode, errorStrategy: 'deep' },
+): ReturnType<F, 'deep'>
+
+// Overload for flatten strategy
+export function useFormValidation<S extends InputSchema<F>, F extends Form>(
+  schema: S,
+  form: MaybeRefOrGetter<F>,
+  options: { mode?: ValidationMode, transformFn: GetErrorsFn<S, F>, errorStrategy: 'flatten' },
+): ReturnType<F, 'flatten'>
+export function useFormValidation<S extends InputSchema<F>, F extends Form>(
+  schema: S,
+  form: MaybeRefOrGetter<F>,
+  options: { mode?: ValidationMode, errorStrategy: 'flatten' },
+): ReturnType<F, 'flatten'>
+
+// Default overloads for backwards compatibility
 export function useFormValidation<S, F extends Form>(
   schema: S,
   form: MaybeRefOrGetter<F>,
@@ -25,14 +50,63 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
   const errors = shallowRef<FieldErrors<F>>({})
   const isLoading = ref(false)
 
-  const errorCount = computed(() => Object.keys(errors.value).length)
+  const errorCount = computed(() => {
+    const countErrors = (obj: any): number => {
+      let count = 0
+      for (const key in obj) {
+        if (typeof obj[key] === 'string') {
+          count++
+        }
+        else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          count += countErrors(obj[key])
+        }
+      }
+      return count
+    }
+    return countErrors(errors.value)
+  })
   const isValid = computed(() => !errorCount.value)
   const hasError = computed(() => !!errorCount.value)
 
   const clearErrors = (): void => {
     errors.value = {}
   }
-  const getErrorMessage = (path: keyof F): string | undefined => errors.value[path]
+  const getErrorMessage = (path: keyof F | string): string | undefined => {
+    if (typeof path === 'string' && path.includes('.')) {
+      // Handle nested path like "user.name"
+      const keys = path.split('.')
+      let current: any = errors.value
+      for (const key of keys) {
+        if (current && typeof current === 'object' && key in current) {
+          current = current[key]
+        }
+        else {
+          return undefined
+        }
+      }
+      return typeof current === 'string' ? current : undefined
+    }
+    // Handle direct property access
+    const error = errors.value[path as keyof F]
+    return typeof error === 'string' ? error : undefined
+  }
+
+  const errorPaths = computed(() => {
+    const paths: string[] = []
+    const extractPaths = (obj: any, prefix = ''): void => {
+      for (const key in obj) {
+        const currentPath = prefix ? `${prefix}.${key}` : key
+        if (typeof obj[key] === 'string') {
+          paths.push(currentPath)
+        }
+        else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          extractPaths(obj[key], currentPath)
+        }
+      }
+    }
+    extractPaths(errors.value)
+    return paths
+  })
 
   const validate = async (): Promise<FieldErrors<F>> => {
     isLoading.value = true
@@ -44,15 +118,28 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
     return errors.value
   }
 
-  const focusInput = ({ inputName }: { inputName: keyof F }): void => {
+  const focusInput = ({ inputName }: { inputName: keyof F | string }): void => {
     getInput(inputName.toString())?.focus()
   }
   const focusFirstErroredInput = (): void => {
-    for (const key in toValue(form)) {
-      if (key in errors.value) {
-        focusInput({ inputName: key })
-        break
+    const findFirstErrorPath = (obj: any, prefix = ''): string | null => {
+      for (const key in obj) {
+        const currentPath = prefix ? `${prefix}.${key}` : key
+        if (typeof obj[key] === 'string') {
+          return currentPath
+        }
+        else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          const nestedPath = findFirstErrorPath(obj[key], currentPath)
+          if (nestedPath)
+            return nestedPath
+        }
       }
+      return null
+    }
+
+    const firstErrorPath = findFirstErrorPath(errors.value)
+    if (firstErrorPath) {
+      focusInput({ inputName: firstErrorPath })
     }
   }
 
@@ -91,6 +178,7 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
     hasError,
     clearErrors,
     getErrorMessage,
+    errorPaths,
     focusFirstErroredInput,
     focusInput,
   }

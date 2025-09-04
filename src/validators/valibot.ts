@@ -11,7 +11,7 @@ export const Valibot = {
     const result = schema._run({ typed: false, value: form }, {})
     result.issues?.forEach((i) => {
       if (errorStrategy === 'flatten') {
-        errors[i.path?.[0].key as keyof F] = i.message
+        errors[i.path?.[0].key as keyof F] = i.message as FieldErrors<F>[keyof F]
       }
       else {
         const path = i.path?.map(p => p.key).join('.')

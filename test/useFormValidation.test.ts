@@ -136,7 +136,6 @@ describe('useFormValidation', () => {
     await validate()
     expect(getErrorMessage('field1')).toBe('Field1 is required')
     expect(getErrorMessage('field2')).toBe('Invalid email')
-    // @ts-expect-error field is invalid on purpose
     expect(getErrorMessage('nonExistentField')).toBeUndefined()
   })
 
@@ -162,5 +161,69 @@ describe('useFormValidation', () => {
     await flushPromises()
     expect(errors.value).toEqual({ field1: 'field1 is required' })
     expect(errors.value.field2).toBeUndefined()
+  })
+
+  it('should focus input with deep path like "user.name"', () => {
+    document.body.innerHTML = `
+      <input name="user.name" />
+      <input name="email" />
+    `
+    const { focusInput } = useFormValidation(schema, form)
+    const input: HTMLInputElement | null = document.querySelector('input[name="user.name"]')
+    expect(input).toBeDefined()
+    const focusSpy = vi.spyOn(input as HTMLInputElement, 'focus')
+    focusInput({ inputName: 'user.name' })
+    expect(focusSpy).toHaveBeenCalled()
+  })
+
+  it('should focus first errored input with deep error strategy', async () => {
+    const nestedSchema = z.object({
+      user: z.object({
+        name: z.string().min(1, 'Name is required'),
+      }),
+      email: z.string().email('Invalid email'),
+    })
+    const nestedForm = ref({
+      user: { name: '' },
+      email: '',
+    })
+    document.body.innerHTML = `
+      <input name="user.name" />
+      <input name="email" />
+    `
+    const mockErrors = { user: { name: 'Name is required' } }
+    vi.mocked(getErrors).mockResolvedValue(mockErrors)
+    const { validate, focusFirstErroredInput } = useFormValidation(nestedSchema, nestedForm, { errorStrategy: 'deep' })
+    await validate()
+    const input: HTMLInputElement | null = document.querySelector('input[name="user.name"]')
+    expect(input).toBeDefined()
+    const focusSpy = vi.spyOn(input as HTMLInputElement, 'focus')
+    focusFirstErroredInput()
+    expect(focusSpy).toHaveBeenCalled()
+  })
+
+  it('should return all error paths including nested ones with errorPaths', async () => {
+    const nestedSchema = z.object({
+      user: z.object({
+        name: z.string().min(1, 'Name is required'),
+        email: z.string().email('Invalid email'),
+      }),
+      password: z.string().min(8, 'Password too short'),
+    })
+    const nestedForm = ref({
+      user: { name: '', email: 'invalid' },
+      password: '123',
+    })
+    const mockErrors = {
+      user: { name: 'Name is required', email: 'Invalid email' },
+      password: 'Password too short',
+    }
+    vi.mocked(getErrors).mockResolvedValue(mockErrors)
+    const { validate, errorPaths, getErrorMessage } = useFormValidation(nestedSchema, nestedForm, { errorStrategy: 'deep' })
+    await validate()
+    expect(errorPaths.value).toEqual(['user.name', 'user.email', 'password'])
+    expect(getErrorMessage('user.name')).toBe('Name is required')
+    expect(getErrorMessage('user.email')).toBe('Invalid email')
+    expect(getErrorMessage('password')).toBe('Password too short')
   })
 })
