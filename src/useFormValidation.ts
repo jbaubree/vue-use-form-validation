@@ -1,4 +1,4 @@
-import type { FieldErrors, Form, GetErrorsFn, InputSchema, ReturnType, ValidationMode } from './types'
+import type { ErrorStrategy, FieldErrors, Form, GetErrorsFn, InputSchema, ReturnType, ValidationMode } from './types'
 import { computed, type MaybeRefOrGetter, ref, shallowRef, toValue, watch } from 'vue'
 import { getErrors } from './errors'
 import { polyfillGroupBy } from './polyfill'
@@ -7,20 +7,20 @@ import { getInput } from './utils'
 export function useFormValidation<S, F extends Form>(
   schema: S,
   form: MaybeRefOrGetter<F>,
-  options: { mode?: ValidationMode, transformFn: GetErrorsFn<S, F> },
+  options: { mode?: ValidationMode, transformFn: GetErrorsFn<S, F>, errorStrategy?: ErrorStrategy },
 ): ReturnType<F>
 export function useFormValidation<S extends InputSchema<F>, F extends Form>(
   schema: S,
   form: MaybeRefOrGetter<F>,
-  options?: { mode?: ValidationMode },
+  options?: { mode?: ValidationMode, errorStrategy?: ErrorStrategy },
 ): ReturnType<F>
 export function useFormValidation<S extends InputSchema<F>, F extends Form>(
   schema: S,
   form: MaybeRefOrGetter<F>,
-  options?: { mode?: ValidationMode, transformFn?: GetErrorsFn<S, F> },
+  options?: { mode?: ValidationMode, transformFn?: GetErrorsFn<S, F>, errorStrategy?: ErrorStrategy },
 ): ReturnType<F> {
   polyfillGroupBy()
-  const opts = { mode: 'lazy' as ValidationMode, transformFn: null, ...options }
+  const opts = { mode: 'lazy' as ValidationMode, transformFn: null, errorStrategy: 'flatten' as ErrorStrategy, ...options }
 
   const errors = shallowRef<FieldErrors<F>>({})
   const isLoading = ref(false)
@@ -36,7 +36,7 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
 
   const validate = async (): Promise<FieldErrors<F>> => {
     isLoading.value = true
-    errors.value = await getErrors(schema, form, opts.transformFn)
+    errors.value = await getErrors(schema, form, opts.transformFn, opts.errorStrategy)
     if (hasError.value)
     // eslint-disable-next-line ts/no-use-before-define
       watchFormChanges()
@@ -65,7 +65,7 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
   const handleBlur = async (field: keyof F): Promise<void> => {
     if (opts.mode === 'onBlur') {
       isLoading.value = true
-      const e = await getErrors(schema, form, opts.transformFn)
+      const e = await getErrors(schema, form, opts.transformFn, opts.errorStrategy)
       errors.value[field] = e[field]
       if (hasError.value)
         watchFormChanges()

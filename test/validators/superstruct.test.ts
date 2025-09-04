@@ -29,7 +29,7 @@ describe('getErrors', () => {
       name: string(),
     })
     const form = { name: 'Valid Name' }
-    const errors = SuperStruct.getErrors(schema, form)
+    const errors = SuperStruct.getErrors(schema, form, 'flatten')
     expect(errors).toEqual({})
   })
 
@@ -39,7 +39,7 @@ describe('getErrors', () => {
     })
     // @ts-expect-error form is invalid on purpose
     const form: Infer<typeof schema> = { name: undefined }
-    const errors = SuperStruct.getErrors(schema, form)
+    const errors = SuperStruct.getErrors(schema, form, 'flatten')
     expect(errors).toEqual({ name: 'Expected a string, but received: undefined' })
   })
 
@@ -50,7 +50,7 @@ describe('getErrors', () => {
     })
     const form = { name: 123, age: 'not a number' }
     // @ts-expect-error form is invalid on purpose
-    const errors = SuperStruct.getErrors(schema, form)
+    const errors = SuperStruct.getErrors(schema, form, 'flatten')
     expect(errors).toEqual({
       name: 'Expected a string, but received: 123',
       age: 'Expected a number, but received: \"not a number\"',
@@ -65,7 +65,32 @@ describe('getErrors', () => {
     })
     const form = { user: { name: 123 } }
     // @ts-expect-error form is invalid on purpose
-    const errors = SuperStruct.getErrors(schema, form)
+    const errors = SuperStruct.getErrors(schema, form, 'flatten')
     expect(errors).toEqual({ user: 'Expected a string, but received: 123' })
+  })
+
+  it('should handle errors with a single field and deep strategy', () => {
+    const schema = object({
+      userName: string(),
+    })
+    const form = { userName: undefined }
+    // @ts-expect-error form is invalid on purpose
+    const errors = SuperStruct.getErrors(schema, form, 'deep')
+    expect(errors).toEqual({ userName: 'Expected a string, but received: undefined' })
+  })
+
+  it('should handle nested errors with deep strategy', () => {
+    const schema = object({
+      user: object({
+        address: object({
+          city: string(),
+          state: string(),
+        }),
+      }),
+    })
+    const form = { user: { address: { city: undefined, state: undefined } } }
+    // @ts-expect-error form is invalid on purpose
+    const errors = SuperStruct.getErrors(schema, form, 'deep')
+    expect(errors).toEqual({ user: { address: { city: 'Expected a string, but received: undefined', state: 'Expected a string, but received: undefined' } } })
   })
 })

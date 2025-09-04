@@ -95,6 +95,7 @@ const options = {
     // Custom validation logic
     return {} // Return errors if any
   },
+  errorStrategy: 'flatten' // or 'deep'
 }
 
 const { validate } = useFormValidation(schema, form, options)
@@ -117,6 +118,7 @@ declare function useFormValidation<S extends InputSchema<F>, F extends Form>(
   options?: {
     mode?: 'eager' | 'lazy' | 'agressive' | 'onBlur' // lazy by default
     transformFn?: GetErrorsFn<S, F>
+    errorStrategy?: 'flatten' | 'deep'
   }
 ): ReturnType<F>
 ```
@@ -128,6 +130,7 @@ declare function useFormValidation<S extends InputSchema<F>, F extends Form>(
 - **options**: Optional configuration object.
   - **mode**: (optional) Validation mode (`'eager'` for immediate validation,`'agressive'` for validation on load, `'lazy'` for validation on form changes or `'onBlur'` for validation on input blur).
   - **transformFn**: (optional) A transformation function that can be used when integrating a different validation library. It allows you to transform data before it is validated. Use this option only if you are integrating another validation library that requires specific data handling.
+  - **errorStrategy**: (optional) Error format mode (`'flatten'` user.name has an error, `'deep'` for { user: { name: 'name has an error' } }).
 
 #### Return Value
 

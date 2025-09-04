@@ -49,7 +49,7 @@ describe('useFormValidation', () => {
     vi.mocked(getErrors).mockResolvedValue(mockErrors)
     const { validate, errors, isValid, errorCount } = useFormValidation(schema, form)
     await validate()
-    expect(getErrors).toHaveBeenCalledWith(schema, form, null)
+    expect(getErrors).toHaveBeenCalledWith(schema, form, null, 'flatten')
     expect(errors.value).toEqual(mockErrors)
     expect(isValid.value).toBe(false)
     expect(errorCount.value).toBe(1)
@@ -95,7 +95,7 @@ describe('useFormValidation', () => {
     expect(errors.value).toEqual({ field1: 'Required' })
     expect(isValid.value).toBe(false)
     expect(errorCount.value).toBe(1)
-    expect(getErrors).toHaveBeenCalledWith(schema, form, null)
+    expect(getErrors).toHaveBeenCalledWith(schema, form, null, 'flatten')
   })
 
   it('should update errors in real-time when form changes in eager mode', async () => {
@@ -124,7 +124,7 @@ describe('useFormValidation', () => {
       },
     })
     await validate()
-    expect(getErrorsSpy).toHaveBeenCalledWith(schema, form, expect.any(Function))
+    expect(getErrorsSpy).toHaveBeenCalledWith(schema, form, expect.any(Function), 'flatten')
     expect(errors.value).toEqual({ field1: 'Transformed error' })
     getErrorsSpy.mockRestore()
   })

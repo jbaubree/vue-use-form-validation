@@ -24,14 +24,14 @@ describe('getErrors', () => {
   it('should return empty errors for valid data', () => {
     const schema = object({ name: string() })
     const form = { name: 'Valid Name' }
-    const errors = Valibot.getErrors(schema, form)
+    const errors = Valibot.getErrors(schema, form, 'flatten')
     expect(errors).toEqual({})
   })
 
   it('should return errors for invalid data', () => {
     const schema = object({ name: string() })
     const form = { name: 123 }
-    const errors = Valibot.getErrors(schema, form)
+    const errors = Valibot.getErrors(schema, form, 'flatten')
     expect(errors).toEqual({ name: 'Invalid type: Expected string but received 123' })
   })
 
@@ -41,7 +41,7 @@ describe('getErrors', () => {
       age: string(),
     })
     const form = { name: 123, age: 456 }
-    const errors = Valibot.getErrors(schema, form)
+    const errors = Valibot.getErrors(schema, form, 'flatten')
     expect(errors).toEqual({
       name: 'Invalid type: Expected string but received 123',
       age: 'Invalid type: Expected string but received 456',
@@ -55,7 +55,30 @@ describe('getErrors', () => {
       }),
     })
     const form = { user: { name: 123 } }
-    const errors = Valibot.getErrors(schema, form)
+    const errors = Valibot.getErrors(schema, form, 'flatten')
     expect(errors).toEqual({ user: 'Invalid type: Expected string but received 123' })
+  })
+
+  it('should handle errors with a single field and deep strategy', () => {
+    const schema = object({
+      userName: string(),
+    })
+    const form = { userName: 123 }
+    const errors = Valibot.getErrors(schema, form, 'deep')
+    expect(errors).toEqual({ userName: 'Invalid type: Expected string but received 123' })
+  })
+
+  it('should handle nested errors with deep strategy', () => {
+    const schema = object({
+      user: object({
+        address: object({
+          city: string(),
+          state: string(),
+        }),
+      }),
+    })
+    const form = { user: { address: { city: 123, state: 123 } } }
+    const errors = Valibot.getErrors(schema, form, 'deep')
+    expect(errors).toEqual({ user: { address: { city: 'Invalid type: Expected string but received 123', state: 'Invalid type: Expected string but received 123' } } })
   })
 })

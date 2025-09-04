@@ -20,8 +20,9 @@ export type Validator = 'Joi' | 'SuperStruct' | 'Valibot' | 'Yup' | 'Zod'
 export type ValidationMode = 'eager' | 'lazy' | 'agressive' | 'onBlur'
 export type Awaitable<T> = T | PromiseLike<T>
 export type FieldErrors<F> = Partial<Record<keyof F, string>>
+export type ErrorStrategy = 'flatten' | 'deep'
 export type Form = Record<string, unknown>
-export type GetErrorsFn<S, F extends Form> = (schema: S, form: F) => Awaitable<FieldErrors<F>>
+export type GetErrorsFn<S, F extends Form> = (schema: S, form: F, errorStrategy: ErrorStrategy) => Awaitable<FieldErrors<F>>
 
 export type InputSchema<F extends Form> =
   | ZodSchema<F>
