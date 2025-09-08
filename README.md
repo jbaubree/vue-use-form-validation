@@ -75,6 +75,7 @@ const {
   getErrorMessage,
   errorPaths,
   focusFirstErroredInput,
+  cleanup,
 } = useFormValidation(schema, form)
 
 // Submit your form
@@ -110,6 +111,7 @@ const { validate } = useFormValidation(schema, form, options)
 - errorPaths: Computed property that returns an array of all error paths, including nested ones (e.g., ["email", "user.name"]).
 - focusFirstErroredInput(): Focuses the first input with an error.
 - focusInput(inputName: keyof F | string): Focuses a specific input by its name. Supports nested paths like "user.name".
+- cleanup(): Manually cleans up watchers, event listeners, and caches. Automatically called on component unmount when used inside a component context.
 
 ## API Reference
 
@@ -148,6 +150,7 @@ Returns an object containing the following properties:
 - `errorPaths`: Computed property that returns an array of all error paths, including nested ones (e.g., ["email", "user.name"]).
 - `focusFirstErroredInput`: Function to focus the first input with an error.
 - `focusInput`: Function to focus a specific input. Supports nested paths like "user.name".
+- `cleanup`: Function to manually clean up watchers, event listeners, and caches. This is automatically called when the component unmounts if used within a component context, but can be called manually when needed (e.g., when using the composable outside of a component or for manual cleanup).
 
 ## Deep Strategy Example
 
