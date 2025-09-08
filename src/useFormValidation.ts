@@ -51,7 +51,7 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
   const isLoading = ref(false)
 
   // Use WeakMap for memoization cache
-  const countCache = new WeakMap<Record<string, any>, number>()
+  const countCache = new WeakMap<Record<string, unknown>, number>()
 
   const errorCount = computed(() => {
     const errorsObj = errors.value
@@ -107,7 +107,7 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
   }
 
   // Use WeakMap for memoization cache
-  const pathsCache = new WeakMap<Record<string, any>, string[]>()
+  const pathsCache = new WeakMap<Record<string, unknown>, string[]>()
 
   const errorPaths = computed(() => {
     const errorsObj = errors.value
