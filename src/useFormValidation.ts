@@ -1,5 +1,5 @@
 import type { ErrorStrategy, FieldErrors, Form, GetErrorsFn, InputSchema, ReturnType, ValidationMode } from './types'
-import { computed, type MaybeRefOrGetter, ref, shallowRef, toValue, watch } from 'vue'
+import { computed, getCurrentInstance, type MaybeRefOrGetter, onBeforeUnmount, ref, shallowRef, toValue, watch } from 'vue'
 import { getErrors } from './errors'
 import { polyfillGroupBy } from './polyfill'
 import { getInput } from './utils'
@@ -50,7 +50,17 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
   const errors = shallowRef<FieldErrors<F>>({})
   const isLoading = ref(false)
 
+  // Use WeakMap for memoization cache
+  const countCache = new WeakMap<Record<string, any>, number>()
+
   const errorCount = computed(() => {
+    const errorsObj = errors.value
+
+    // Check cache first
+    if (countCache.has(errorsObj)) {
+      return countCache.get(errorsObj)!
+    }
+
     const countErrors = (obj: any): number => {
       let count = 0
       for (const key in obj) {
@@ -63,7 +73,12 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
       }
       return count
     }
-    return countErrors(errors.value)
+
+    const count = countErrors(errorsObj)
+
+    // Cache the result
+    countCache.set(errorsObj, count)
+    return count
   })
   const isValid = computed(() => !errorCount.value)
   const hasError = computed(() => !!errorCount.value)
@@ -91,7 +106,17 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
     return typeof error === 'string' ? error : undefined
   }
 
+  // Use WeakMap for memoization cache
+  const pathsCache = new WeakMap<Record<string, any>, string[]>()
+
   const errorPaths = computed(() => {
+    const errorsObj = errors.value
+
+    // Check cache first
+    if (pathsCache.has(errorsObj)) {
+      return pathsCache.get(errorsObj)!
+    }
+
     const paths: string[] = []
     const extractPaths = (obj: any, prefix = ''): void => {
       for (const key in obj) {
@@ -104,7 +129,10 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
         }
       }
     }
-    extractPaths(errors.value)
+    extractPaths(errorsObj)
+
+    // Cache the result
+    pathsCache.set(errorsObj, paths)
     return paths
   })
 
@@ -160,16 +188,44 @@ export function useFormValidation<S extends InputSchema<F>, F extends Form>(
     }
   }
 
+  const eventListeners: Array<{ element: HTMLInputElement, handler: () => void }> = []
+
   if (opts.mode === 'onBlur') {
     Object.keys(toValue(form)).forEach((inputName) => {
-      getInput(inputName)?.addEventListener('blur', () => handleBlur(inputName as keyof F))
+      const input = getInput(inputName)
+      if (input) {
+        const handler = (): Promise<void> => handleBlur(inputName as keyof F)
+        input.addEventListener('blur', handler)
+        eventListeners.push({ element: input, handler })
+      }
     })
   }
   if ((['eager', 'agressive'] as ValidationMode[]).includes(opts.mode)) {
     watchFormChanges(opts.mode === 'agressive')
   }
 
+  const cleanup = (): void => {
+    // Remove form watcher
+    unwatch?.()
+    unwatch = null
+
+    // Remove all event listeners
+    eventListeners.forEach(({ element, handler }) => {
+      element.removeEventListener('blur', handler)
+    })
+    eventListeners.length = 0
+
+    // Clear memoization caches by clearing the errors object
+    clearErrors()
+  }
+
+  // Only register onBeforeUnmount if we're inside a component context
+  if (getCurrentInstance()) {
+    onBeforeUnmount(() => cleanup())
+  }
+
   return {
+    cleanup,
     validate,
     errors,
     errorCount,

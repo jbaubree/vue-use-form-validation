@@ -32,6 +32,8 @@ const {
   getErrorMessage,
   errorPaths,
   validate,
+  clearErrors,
+  cleanup,
 } = useFormValidation(schema, form, { errorStrategy: 'deep' })
 
 async function onSubmit() {
@@ -49,15 +51,17 @@ async function onSubmit() {
     <UText as="h1" label="Form example" class="mb-5" :ui="{ font: 'font-bold', size: 'text-2xl' }" />
     <form class="flex flex-col gap-3 mb-5">
       <UFormGroup label="User Name" :error="getErrorMessage('user.name')" is-required>
-        <UInput v-model="form.user.name" name="user.name" type="text" placeholder="Enter your name" size="md" />
+        <UInput v-model="form.user.name" name="user.name" type="text" placeholder="Enter your name" autofocus size="md" />
       </UFormGroup>
       <UFormGroup label="Email" :error="getErrorMessage('email')" is-required>
-        <UInput v-model="form.email" name="email" type="email" placeholder="email@email.com" autofocus size="md" />
+        <UInput v-model="form.email" name="email" type="email" placeholder="email@email.com" size="md" />
       </UFormGroup>
       <UFormGroup label="Password" :error="getErrorMessage('password')" is-required>
         <UInput v-model="form.password" name="password" type="password" placeholder="**********" size="md" />
       </UFormGroup>
       <UButton label="Submit" color="pilot" is-block :is-loading="isLoading" @click="onSubmit" />
+      <UButton label="Clear errors" color="orange" is-block @click="clearErrors()" />
+      <UButton label="Cleanup form validation" color="red" is-block @click="cleanup()" />
     </form>
     <UCard v-if="hasError" :ui="{ background: 'bg-red-200 dark:bg-red-600', body: { base: 'flex flex-col items-start gap-2' } }">
       <UText :label="`Form has ${errorCount} ${errorCount > 1 ? 'errors' : 'error'}:`" :ui="{ font: 'font-bold', size: 'text-lg' }" class="mb-1" />

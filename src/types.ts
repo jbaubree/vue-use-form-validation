@@ -57,4 +57,5 @@ export interface ReturnType<F, Strategy extends ErrorStrategy = ErrorStrategy> {
   errorPaths: ComputedRef<string[]>
   focusFirstErroredInput: () => void
   focusInput: (options: { inputName: keyof F | string }) => void
+  cleanup: () => void
 }

@@ -226,4 +226,42 @@ describe('useFormValidation', () => {
     expect(getErrorMessage('user.email')).toBe('Invalid email')
     expect(getErrorMessage('password')).toBe('Password too short')
   })
+
+  it('should properly cleanup event listeners and watchers', () => {
+    document.body.innerHTML = `
+      <input name="field1" />
+      <input name="field2" />
+    `
+    const input1 = document.querySelector<HTMLInputElement>('input[name="field1"]')
+    const input2 = document.querySelector<HTMLInputElement>('input[name="field2"]')
+
+    const addEventListenerSpy1 = vi.spyOn(input1 as HTMLInputElement, 'addEventListener')
+    const removeEventListenerSpy1 = vi.spyOn(input1 as HTMLInputElement, 'removeEventListener')
+    const addEventListenerSpy2 = vi.spyOn(input2 as HTMLInputElement, 'addEventListener')
+    const removeEventListenerSpy2 = vi.spyOn(input2 as HTMLInputElement, 'removeEventListener')
+
+    const { cleanup } = useFormValidation(schema, form, { mode: 'onBlur' })
+
+    expect(addEventListenerSpy1).toHaveBeenCalledWith('blur', expect.any(Function))
+    expect(addEventListenerSpy2).toHaveBeenCalledWith('blur', expect.any(Function))
+
+    cleanup()
+
+    expect(removeEventListenerSpy1).toHaveBeenCalledWith('blur', expect.any(Function))
+    expect(removeEventListenerSpy2).toHaveBeenCalledWith('blur', expect.any(Function))
+  })
+
+  it('should use memoization for errorPaths computation', async () => {
+    const mockErrors = { field1: 'Required' }
+    vi.mocked(getErrors).mockResolvedValue(mockErrors)
+    const { validate, errorPaths } = useFormValidation(schema, form)
+
+    await validate()
+    const firstCall = errorPaths.value
+    const secondCall = errorPaths.value
+
+    // Should return the same array reference due to memoization
+    expect(firstCall).toBe(secondCall)
+    expect(firstCall).toEqual(['field1'])
+  })
 })
