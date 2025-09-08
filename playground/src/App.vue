@@ -7,17 +7,22 @@ import * as z from 'zod'
 const toast = useToast()
 
 const schema = z.object({
+  user: z.object({
+    name: z.string().min(1),
+  }),
   email: z.string().email(),
   password: z.string().min(8),
 })
 
 const form = ref({
+  user: {
+    name: '',
+  },
   email: '',
   password: '',
 })
 
 const {
-  errors,
   errorCount,
   hasError,
   isLoading,
@@ -25,8 +30,11 @@ const {
   focusFirstErroredInput,
   focusInput,
   getErrorMessage,
+  errorPaths,
   validate,
-} = useFormValidation(schema, form)
+  clearErrors,
+  cleanup,
+} = useFormValidation(schema, form, { errorStrategy: 'deep' })
 
 async function onSubmit() {
   await validate()
@@ -42,28 +50,31 @@ async function onSubmit() {
   <UContainer class="py-5">
     <UText as="h1" label="Form example" class="mb-5" :ui="{ font: 'font-bold', size: 'text-2xl' }" />
     <form class="flex flex-col gap-3 mb-5">
+      <UFormGroup label="User Name" :error="getErrorMessage('user.name')" is-required>
+        <UInput v-model="form.user.name" name="user.name" type="text" placeholder="Enter your name" autofocus size="md" />
+      </UFormGroup>
       <UFormGroup label="Email" :error="getErrorMessage('email')" is-required>
-        <UInput v-model="form.email" name="email" type="email" placeholder="email@email.com" autofocus size="md" />
+        <UInput v-model="form.email" name="email" type="email" placeholder="email@email.com" size="md" />
       </UFormGroup>
       <UFormGroup label="Password" :error="getErrorMessage('password')" is-required>
         <UInput v-model="form.password" name="password" type="password" placeholder="**********" size="md" />
       </UFormGroup>
       <UButton label="Submit" color="pilot" is-block :is-loading="isLoading" @click="onSubmit" />
+      <UButton label="Clear errors" color="orange" is-block @click="clearErrors()" />
+      <UButton label="Cleanup form validation" color="red" is-block @click="cleanup()" />
     </form>
     <UCard v-if="hasError" :ui="{ background: 'bg-red-200 dark:bg-red-600', body: { base: 'flex flex-col items-start gap-2' } }">
       <UText :label="`Form has ${errorCount} ${errorCount > 1 ? 'errors' : 'error'}:`" :ui="{ font: 'font-bold', size: 'text-lg' }" class="mb-1" />
       <div
-        v-for="
-          error, i in Object.keys(errors) as Array<keyof typeof errors>
-        "
+        v-for="errorPath, i in errorPaths"
         :key="i"
         class="flex items-center"
       >
         <UIcon name="icon-ph-dot-bold" color="dark" />
         <UButton
           class="ml-3" color="dark" :is-padded="false" variant="link"
-          :label="getErrorMessage(error)"
-          @click="focusInput({ inputName: error })"
+          :label="getErrorMessage(errorPath)"
+          @click="focusInput({ inputName: errorPath })"
         />
       </div>
     </UCard>

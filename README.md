@@ -73,7 +73,9 @@ const {
   errorCount,
   clearErrors,
   getErrorMessage,
+  errorPaths,
   focusFirstErroredInput,
+  cleanup,
 } = useFormValidation(schema, form)
 
 // Submit your form
@@ -95,6 +97,7 @@ const options = {
     // Custom validation logic
     return {} // Return errors if any
   },
+  errorStrategy: 'flatten' // or 'deep'
 }
 
 const { validate } = useFormValidation(schema, form, options)
@@ -104,9 +107,11 @@ const { validate } = useFormValidation(schema, form, options)
 
 - validate(): Triggers the validation process.
 - clearErrors(): Resets the validation errors.
-- getErrorMessage(path: keyof F): Retrieves the error message for a specific field.
+- getErrorMessage(path: keyof F | string): Retrieves the error message for a specific field. Supports nested paths like "user.name".
+- errorPaths: Computed property that returns an array of all error paths, including nested ones (e.g., ["email", "user.name"]).
 - focusFirstErroredInput(): Focuses the first input with an error.
-- focusInput(inputName: keyof F): Focuses a specific input by its name.
+- focusInput(inputName: keyof F | string): Focuses a specific input by its name. Supports nested paths like "user.name".
+- cleanup(): Manually cleans up watchers, event listeners, and caches. Automatically called on component unmount when used inside a component context.
 
 ## API Reference
 
@@ -117,6 +122,7 @@ declare function useFormValidation<S extends InputSchema<F>, F extends Form>(
   options?: {
     mode?: 'eager' | 'lazy' | 'agressive' | 'onBlur' // lazy by default
     transformFn?: GetErrorsFn<S, F>
+    errorStrategy?: 'flatten' | 'deep'
   }
 ): ReturnType<F>
 ```
@@ -128,6 +134,7 @@ declare function useFormValidation<S extends InputSchema<F>, F extends Form>(
 - **options**: Optional configuration object.
   - **mode**: (optional) Validation mode (`'eager'` for immediate validation,`'agressive'` for validation on load, `'lazy'` for validation on form changes or `'onBlur'` for validation on input blur).
   - **transformFn**: (optional) A transformation function that can be used when integrating a different validation library. It allows you to transform data before it is validated. Use this option only if you are integrating another validation library that requires specific data handling.
+  - **errorStrategy**: (optional) Error format mode (`'flatten'` user.name has an error, `'deep'` for { user: { name: 'name has an error' } }).
 
 #### Return Value
 
@@ -139,9 +146,67 @@ Returns an object containing the following properties:
 - `isLoading`: Reactive reference indicating if the form validation is in progress.
 - `errorCount`: Reactive reference to the number of errors.
 - `clearErrors`: Function to clear validation errors.
-- `getErrorMessage`: Function to get the error message for a specific field.
+- `getErrorMessage`: Function to get the error message for a specific field. Supports nested paths like "user.name".
+- `errorPaths`: Computed property that returns an array of all error paths, including nested ones (e.g., ["email", "user.name"]).
 - `focusFirstErroredInput`: Function to focus the first input with an error.
-- `focusInput`: Function to focus a specific input.
+- `focusInput`: Function to focus a specific input. Supports nested paths like "user.name".
+- `cleanup`: Function to manually clean up watchers, event listeners, and caches. This is automatically called when the component unmounts if used within a component context, but can be called manually when needed (e.g., when using the composable outside of a component or for manual cleanup).
+
+## Deep Strategy Example
+
+When using the `errorStrategy: 'deep'` option, you can work with nested form structures and automatically get all error paths:
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import { useFormValidation } from 'vue-use-form-validation'
+import * as z from 'zod'
+
+const schema = z.object({
+  user: z.object({
+    name: z.string().min(1, 'Name is required'),
+  }),
+  email: z.string().email('Invalid email'),
+})
+
+const form = ref({
+  user: { name: '' },
+  email: '',
+})
+
+const {
+  validate,
+  hasError,
+  errorPaths,
+  getErrorMessage,
+  focusInput,
+} = useFormValidation(schema, form, { errorStrategy: 'deep' })
+
+async function onSubmit() {
+  await validate()
+  if (!isValid.value) {
+    // errorPaths.value will contain ["user.name", "email"] when there are errors
+    console.log('Error paths:', errorPaths.value)
+  }
+}
+</script>
+
+<template>
+  <form @submit.prevent="onSubmit">
+    <input v-model="form.user.name" name="user.name" placeholder="Name">
+    <input v-model="form.email" name="email" placeholder="Email">
+
+    <!-- Display all errors with automatic deep path handling -->
+    <div v-if="hasError">
+      <div v-for="errorPath in errorPaths" :key="errorPath">
+        <button @click="focusInput({ inputName: errorPath })">
+          {{ getErrorMessage(errorPath) }}
+        </button>
+      </div>
+    </div>
+  </form>
+</template>
+```
 
 ## Example
 

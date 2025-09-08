@@ -24,14 +24,14 @@ describe('getErrors', () => {
   it('should return empty errors for valid data', async () => {
     const schema = yup.object({ name: yup.string().required() })
     const form = { name: 'Valid Name' }
-    const errors = await Yup.getErrors(schema, form)
+    const errors = await Yup.getErrors(schema, form, 'flatten')
     expect(errors).toEqual({})
   })
 
   it('should return errors for invalid data', async () => {
     const schema = yup.object({ name: yup.string().required() })
     const form = { name: '' }
-    const errors = await Yup.getErrors(schema, form)
+    const errors = await Yup.getErrors(schema, form, 'flatten')
     expect(errors).toEqual({ name: 'name is a required field' })
   })
 
@@ -41,7 +41,7 @@ describe('getErrors', () => {
       age: yup.number().min(18, 'Must be 18 or older'),
     })
     const form = { name: '', age: 16 }
-    const errors = await Yup.getErrors(schema, form)
+    const errors = await Yup.getErrors(schema, form, 'flatten')
     expect(errors).toEqual({
       name: 'name is a required field',
       age: 'Must be 18 or older',
@@ -54,8 +54,31 @@ describe('getErrors', () => {
         name: yup.string().required(),
       }),
     })
-    const form = { user: { name: '' } }
-    const errors = await Yup.getErrors(schema, form)
+    const form = { user: { name: '', age: -1 } }
+    const errors = await Yup.getErrors(schema, form, 'flatten')
     expect(errors).toEqual({ user: 'user.name is a required field' })
+  })
+
+  it('should handle errors with a single field and deep strategy', async () => {
+    const schema = yup.object({
+      userName: yup.string().required(),
+    })
+    const form = { userName: '' }
+    const errors = await Yup.getErrors(schema, form, 'deep')
+    expect(errors).toEqual({ userName: 'userName is a required field' })
+  })
+
+  it('should handle nested errors with deep strategy', async () => {
+    const schema = yup.object({
+      user: yup.object({
+        address: yup.object({
+          city: yup.string().required(),
+          state: yup.string().required(),
+        }),
+      }),
+    })
+    const form = { user: { address: { city: '', state: '' } } }
+    const errors = await Yup.getErrors(schema, form, 'deep')
+    expect(errors).toEqual({ user: { address: { city: 'city is a required field', state: 'state is a required field' } } })
   })
 })

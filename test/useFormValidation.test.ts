@@ -49,7 +49,7 @@ describe('useFormValidation', () => {
     vi.mocked(getErrors).mockResolvedValue(mockErrors)
     const { validate, errors, isValid, errorCount } = useFormValidation(schema, form)
     await validate()
-    expect(getErrors).toHaveBeenCalledWith(schema, form, null)
+    expect(getErrors).toHaveBeenCalledWith(schema, form, null, 'flatten')
     expect(errors.value).toEqual(mockErrors)
     expect(isValid.value).toBe(false)
     expect(errorCount.value).toBe(1)
@@ -95,7 +95,7 @@ describe('useFormValidation', () => {
     expect(errors.value).toEqual({ field1: 'Required' })
     expect(isValid.value).toBe(false)
     expect(errorCount.value).toBe(1)
-    expect(getErrors).toHaveBeenCalledWith(schema, form, null)
+    expect(getErrors).toHaveBeenCalledWith(schema, form, null, 'flatten')
   })
 
   it('should update errors in real-time when form changes in eager mode', async () => {
@@ -124,7 +124,7 @@ describe('useFormValidation', () => {
       },
     })
     await validate()
-    expect(getErrorsSpy).toHaveBeenCalledWith(schema, form, expect.any(Function))
+    expect(getErrorsSpy).toHaveBeenCalledWith(schema, form, expect.any(Function), 'flatten')
     expect(errors.value).toEqual({ field1: 'Transformed error' })
     getErrorsSpy.mockRestore()
   })
@@ -136,7 +136,6 @@ describe('useFormValidation', () => {
     await validate()
     expect(getErrorMessage('field1')).toBe('Field1 is required')
     expect(getErrorMessage('field2')).toBe('Invalid email')
-    // @ts-expect-error field is invalid on purpose
     expect(getErrorMessage('nonExistentField')).toBeUndefined()
   })
 
@@ -162,5 +161,107 @@ describe('useFormValidation', () => {
     await flushPromises()
     expect(errors.value).toEqual({ field1: 'field1 is required' })
     expect(errors.value.field2).toBeUndefined()
+  })
+
+  it('should focus input with deep path like "user.name"', () => {
+    document.body.innerHTML = `
+      <input name="user.name" />
+      <input name="email" />
+    `
+    const { focusInput } = useFormValidation(schema, form)
+    const input: HTMLInputElement | null = document.querySelector('input[name="user.name"]')
+    expect(input).toBeDefined()
+    const focusSpy = vi.spyOn(input as HTMLInputElement, 'focus')
+    focusInput({ inputName: 'user.name' })
+    expect(focusSpy).toHaveBeenCalled()
+  })
+
+  it('should focus first errored input with deep error strategy', async () => {
+    const nestedSchema = z.object({
+      user: z.object({
+        name: z.string().min(1, 'Name is required'),
+      }),
+      email: z.string().email('Invalid email'),
+    })
+    const nestedForm = ref({
+      user: { name: '' },
+      email: '',
+    })
+    document.body.innerHTML = `
+      <input name="user.name" />
+      <input name="email" />
+    `
+    const mockErrors = { user: { name: 'Name is required' } }
+    vi.mocked(getErrors).mockResolvedValue(mockErrors)
+    const { validate, focusFirstErroredInput } = useFormValidation(nestedSchema, nestedForm, { errorStrategy: 'deep' })
+    await validate()
+    const input: HTMLInputElement | null = document.querySelector('input[name="user.name"]')
+    expect(input).toBeDefined()
+    const focusSpy = vi.spyOn(input as HTMLInputElement, 'focus')
+    focusFirstErroredInput()
+    expect(focusSpy).toHaveBeenCalled()
+  })
+
+  it('should return all error paths including nested ones with errorPaths', async () => {
+    const nestedSchema = z.object({
+      user: z.object({
+        name: z.string().min(1, 'Name is required'),
+        email: z.string().email('Invalid email'),
+      }),
+      password: z.string().min(8, 'Password too short'),
+    })
+    const nestedForm = ref({
+      user: { name: '', email: 'invalid' },
+      password: '123',
+    })
+    const mockErrors = {
+      user: { name: 'Name is required', email: 'Invalid email' },
+      password: 'Password too short',
+    }
+    vi.mocked(getErrors).mockResolvedValue(mockErrors)
+    const { validate, errorPaths, getErrorMessage } = useFormValidation(nestedSchema, nestedForm, { errorStrategy: 'deep' })
+    await validate()
+    expect(errorPaths.value).toEqual(['user.name', 'user.email', 'password'])
+    expect(getErrorMessage('user.name')).toBe('Name is required')
+    expect(getErrorMessage('user.email')).toBe('Invalid email')
+    expect(getErrorMessage('password')).toBe('Password too short')
+  })
+
+  it('should properly cleanup event listeners and watchers', () => {
+    document.body.innerHTML = `
+      <input name="field1" />
+      <input name="field2" />
+    `
+    const input1 = document.querySelector<HTMLInputElement>('input[name="field1"]')
+    const input2 = document.querySelector<HTMLInputElement>('input[name="field2"]')
+
+    const addEventListenerSpy1 = vi.spyOn(input1 as HTMLInputElement, 'addEventListener')
+    const removeEventListenerSpy1 = vi.spyOn(input1 as HTMLInputElement, 'removeEventListener')
+    const addEventListenerSpy2 = vi.spyOn(input2 as HTMLInputElement, 'addEventListener')
+    const removeEventListenerSpy2 = vi.spyOn(input2 as HTMLInputElement, 'removeEventListener')
+
+    const { cleanup } = useFormValidation(schema, form, { mode: 'onBlur' })
+
+    expect(addEventListenerSpy1).toHaveBeenCalledWith('blur', expect.any(Function))
+    expect(addEventListenerSpy2).toHaveBeenCalledWith('blur', expect.any(Function))
+
+    cleanup()
+
+    expect(removeEventListenerSpy1).toHaveBeenCalledWith('blur', expect.any(Function))
+    expect(removeEventListenerSpy2).toHaveBeenCalledWith('blur', expect.any(Function))
+  })
+
+  it('should use memoization for errorPaths computation', async () => {
+    const mockErrors = { field1: 'Required' }
+    vi.mocked(getErrors).mockResolvedValue(mockErrors)
+    const { validate, errorPaths } = useFormValidation(schema, form)
+
+    await validate()
+    const firstCall = errorPaths.value
+    const secondCall = errorPaths.value
+
+    // Should return the same array reference due to memoization
+    expect(firstCall).toBe(secondCall)
+    expect(firstCall).toEqual(['field1'])
   })
 })
